@@ -1,0 +1,14 @@
+{
+  "name": "matibhanga-degree-college-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "মাটিভাঙ্গা ডিগ্রি কলেজ মোবাইল অ্যাপ",
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.2.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "মাটিভাঙ্গা ডিগ্রি কলেজ",
+  "short_name": "মাটিভাঙ্গা কলেজ",
+  "description": "মাটিভাঙ্গা ডিগ্রি কলেজ, নাজিরপুর, পিরোজপুর — রেজাল্ট, ক্লাস রুটিন, অ্যাডমিট কার্ড, হাজিরা ও আরও সেবা",
+  "lang": "bn",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f6b4f",
+  "theme_color": "#0f6b4f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "সর্বশেষ রেজাল্ট", "url": "./index.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "যোগাযোগ", "url": "./index.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}
