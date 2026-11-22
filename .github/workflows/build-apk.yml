@@ -3,7 +3,16 @@ name: Build Android APK
 on:
   push:
     branches: [main, master]
+    paths:
+      - "www/**"
+      - "assets/**"
+      - "package.json"
+      - "capacitor.config.json"
+      - ".github/workflows/build-apk.yml"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -19,6 +28,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+
+      - name: Stamp build number into app
+        run: sed -i "s/var APP_BUILD = 0;/var APP_BUILD = ${{ github.run_number }};/" www/index.html
 
       - name: Install dependencies
         run: npm install
@@ -38,9 +50,21 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk matibhanga-college.apk
+
+      - name: Upload APK (artifact)
         uses: actions/upload-artifact@v4
         with:
           name: matibhanga-college-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: matibhanga-college.apk
           if-no-files-found: error
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "অ্যাপ সংস্করণ ${{ github.run_number }}"
+          body: "মাটিভাঙ্গা ডিগ্রি কলেজ অ্যাপ — নতুন সংস্করণ। matibhanga-college.apk ডাউনলোড করে ইনস্টল করুন।"
+          files: matibhanga-college.apk
+          make_latest: true
