@@ -5,6 +5,7 @@
   "description": "মাটিভাঙ্গা ডিগ্রি কলেজ মোবাইল অ্যাপ",
   "dependencies": {
     "@capacitor/android": "^6.2.0",
+    "@capacitor/browser": "^6.0.0",
     "@capacitor/core": "^6.2.0"
   },
   "devDependencies": {
