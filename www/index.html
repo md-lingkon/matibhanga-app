@@ -258,6 +258,7 @@ nav button.active .i{filter:none;opacity:1}
         <div class="ic">🌐</div><div class="t"><b>অফিশিয়াল ওয়েবসাইট</b><span>sites.google.com/view/matibhangadegreecollege</span></div><span class="go">›</span>
       </a>
     </div>
+    <div class="note" id="syncStatus"></div>
   </section>
 </main>
 
@@ -406,9 +407,16 @@ nav button.active .i{filter:none;opacity:1}
     var out = [];
     Array.prototype.forEach.call(doc.querySelectorAll("a[href]"), function(a){
       var h = unwrapUrl(a.getAttribute("href"));
-      if(!/^https:\/\//.test(h) || h.indexOf("https://sites.google.com/") === 0) return;
+      if(!/^https?:\/\//.test(h) || /^https?:\/\/sites\.google\.com\//.test(h)) return;
       out.push({ t:(a.textContent||"").replace(/\s+/g," ").trim(), u:h });
     });
+    if(!out.length){
+      // পেজে <a> না থাকলে (লিংক স্ক্রিপ্টের ডেটায় থাকলে) সরাসরি Script লিংক খুঁজে নেয়
+      var raw = html.replace(/\\u003d/g,"=").replace(/\\u0026/g,"&").replace(/\\\//g,"/").replace(/&amp;/g,"&");
+      var m = raw.match(/https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_\-]+\/exec[^"'\\\s<>)]*/g) || [];
+      var seen = {};
+      m.forEach(function(u){ if(!seen[u]){ seen[u]=1; out.push({t:"", u:u}); } });
+    }
     return out;
   }
   function paintLatest(label){
@@ -420,39 +428,50 @@ nav button.active .i{filter:none;opacity:1}
   function applyLinks(map){
     for(var k in map){
       if(k === "_latest"){ paintLatest(map[k]); continue; }
-      if(LINKS[k] && /^https:\/\//.test(map[k])) LINKS[k].u = map[k];
+      if(LINKS[k] && /^https?:\/\//.test(map[k])) LINKS[k].u = map[k];
     }
+  }
+  function setSync(msg){
+    var el = $("#syncStatus"); if(!el) return;
+    var d = new Date();
+    el.textContent = "লিংক সিঙ্ক: " + msg + " · " + d.toLocaleDateString("bn-BD") + " " + d.toLocaleTimeString("bn-BD");
   }
   function syncLinks(){
     try{ var c = localStorage.getItem("linkCache"); if(c) applyLinks(JSON.parse(c)); }catch(e){}
     try{
       var C = window.Capacitor;
       var native = C && C.isNativePlatform && C.isNativePlatform();
-      if(!native || !navigator.onLine || !window.fetch || !window.DOMParser) return;
+      if(!native){ setSync("শুধু APK অ্যাপে চলে"); return; }
+      if(!navigator.onLine){ setSync("ইন্টারনেট নেই (আগের লিংক ব্যবহার হচ্ছে)"); return; }
+      if(!window.fetch || !window.DOMParser){ setSync("এই ফোনে সমর্থিত নয়"); return; }
+      var errs = [];
       Promise.all(PAGES.map(function(p){
         return fetch(SITE + p, {cache:"no-store"})
-          .then(function(r){ return r.ok ? r.text() : ""; })
-          .then(function(h){ return h ? [p, parsePage(h)] : [p, null]; })
-          .catch(function(){ return [p, null]; });
+          .then(function(r){ if(!r.ok){ errs.push(p + " HTTP " + r.status); return [p, null]; } return r.text(); })
+          .then(function(h){ if(Array.isArray(h)) return h; return [p, parsePage(h)]; })
+          .catch(function(e){ errs.push(p + " " + String((e && e.message) || e).slice(0,40)); return [p, null]; });
       })).then(function(res){
-        var pages = {}; res.forEach(function(x){ pages[x[0]] = x[1]; });
+        var pages = {}, info = [];
+        res.forEach(function(x){ pages[x[0]] = x[1]; info.push(x[0] + ":" + (x[1] ? x[1].length : "✗")); });
         var map = {};
         RULES.forEach(function(r){
           var links = pages[r[1]]; if(!links) return;
           for(var i=0;i<links.length;i++){
             if(!r[2] || r[2](links[i].t)){
               map[r[0]] = links[i].u;
-              if(r[0] === "result_latest") map._latest = links[i].t;
+              if(r[0] === "result_latest" && links[i].t) map._latest = links[i].t;
               break;
             }
           }
         });
-        if(Object.keys(map).length){
+        var found = Object.keys(map).filter(function(k){ return k !== "_latest"; }).length;
+        if(found){
           applyLinks(map);
           try{ localStorage.setItem("linkCache", JSON.stringify(map)); }catch(e){}
         }
-      }).catch(function(){});
-    }catch(e){}
+        setSync(found + "/" + RULES.length + " লিংক পাওয়া গেছে [" + info.join(", ") + "]" + (errs.length ? " ত্রুটি: " + errs.slice(0,2).join("; ") : ""));
+      }).catch(function(e){ setSync("ব্যর্থ — " + String((e && e.message) || e).slice(0,60)); });
+    }catch(e){ setSync("ব্যর্থ — " + String((e && e.message) || e).slice(0,60)); }
   }
   syncLinks();
 
