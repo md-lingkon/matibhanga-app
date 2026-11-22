@@ -306,9 +306,22 @@ nav button.active .i{filter:none;opacity:1}
 
   // Viewer
   var frame = $("#vFrame"), loadTimer = null, curUrl = "";
+  // Google Script পেজ ফ্রেমে খোলে না, তাই সবকিছু আলাদা ট্যাব/ইন-অ্যাপ ব্রাউজারে খোলা হয়
+  var USE_IFRAME = false;
+  function openExternal(url){
+    try{
+      var C = window.Capacitor;
+      if(C && C.isNativePlatform && C.isNativePlatform() && C.Plugins && C.Plugins.Browser){
+        C.Plugins.Browser.open({ url: url, presentationStyle: "fullscreen" });
+        return;
+      }
+    }catch(e){}
+    var w = window.open(url, "_blank");
+    if(!w) location.href = url;
+  }
   function openLink(key){
     var l = LINKS[key]; if(!l) return;
-    if(l.ext){ window.open(l.u, "_blank", "noopener"); return; }
+    if(l.ext || !USE_IFRAME){ openExternal(l.u); return; }
     curUrl = l.u;
     $("#vTitle").textContent = l.t;
     $("#vLoading").classList.remove("hide");
@@ -333,7 +346,7 @@ nav button.active .i{filter:none;opacity:1}
     }
   });
   $("#vClose").onclick = function(){ closeViewer(false) };
-  $("#vExt").onclick = function(){ window.open(curUrl, "_blank", "noopener") };
+  $("#vExt").onclick = function(){ openExternal(curUrl) };
   window.addEventListener("popstate", function(){
     if($("#viewer").classList.contains("open")) closeViewer(true);
   });
