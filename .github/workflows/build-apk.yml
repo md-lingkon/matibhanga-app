@@ -44,6 +44,18 @@ jobs:
       - name: Sync web files
         run: npx cap sync android
 
+      - name: Use permanent signing key
+        env:
+          KS: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            mkdir -p ~/.android
+            echo "$KS" | base64 -d > ~/.android/debug.keystore
+            echo "স্থায়ী সাইনিং কী ব্যবহার হচ্ছে"
+          else
+            echo "KEYSTORE_BASE64 সেট করা নেই — সাময়িক কী ব্যবহার হবে"
+          fi
+
       - name: Build debug APK
         working-directory: android
         run: |
