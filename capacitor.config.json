@@ -1,12 +1,21 @@
 {
   "appId": "com.matibhanga.college",
-  "appName": "মাটিভাঙ্গা কলেজ",
+  "appName": "মাটিভাঙ্গা ডিগ্রি কলেজ",
   "webDir": "www",
   "server": {
     "androidScheme": "https",
-    "allowNavigation": ["script.google.com", "*.googleusercontent.com", "*.google.com"]
+    "allowNavigation": [
+      "script.google.com",
+      "*.googleusercontent.com",
+      "*.google.com"
+    ]
   },
   "android": {
     "allowMixedContent": false
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
   }
 }
