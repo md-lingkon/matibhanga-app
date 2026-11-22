@@ -38,6 +38,12 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Set app version
+        run: |
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i "s/versionName \"1.0\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+
       - name: Generate app icons
         run: npx capacitor-assets generate --android
 
@@ -61,6 +67,11 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
+
+      - name: Show signing fingerprint
+        run: |
+          echo "==== এই APK-এর সাইনিং ফিঙ্গারপ্রিন্ট (প্রতিবার এক হতে হবে) ===="
+          keytool -printcert -jarfile android/app/build/outputs/apk/debug/app-debug.apk | grep -E "SHA256|Owner" || echo "ফিঙ্গারপ্রিন্ট পড়া যায়নি"
 
       - name: Rename APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk matibhanga-college.apk
