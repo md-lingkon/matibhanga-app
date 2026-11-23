@@ -60,6 +60,15 @@ public class MainActivity extends BridgeActivity {
         "padding:10px 16px;border-radius:24px;font:600 14px sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.4);opacity:.92';" +
         "b.onclick=function(){location.href='" + HOME + "';};document.body.appendChild(b);})();";
 
+    // গুগলের "This application was created by a Google Apps Script user" ব্যানার লুকানো
+    private static final String HIDE_BANNER_JS =
+        "(function(){function f(){var all=document.body?document.body.getElementsByTagName('*'):[];" +
+        "for(var i=0;i<all.length;i++){var e=all[i];" +
+        "if(e.children.length===0&&/created by a Google Apps Script user/i.test(e.textContent||'')){" +
+        "var t=e;while(t.parentElement&&!t.parentElement.querySelector('iframe')){t=t.parentElement;}" +
+        "t.style.display='none';return true;}}return false;}" +
+        "if(!f()){var n=0,iv=setInterval(function(){if(f()||++n>20)clearInterval(iv);},300);}})();";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +101,7 @@ public class MainActivity extends BridgeActivity {
                 if (url.startsWith(HOME)) {
                     if (clearHistoryNext) { view.clearHistory(); clearHistoryNext = false; }
                 } else if (url.startsWith("http")) {
+                    view.evaluateJavascript(HIDE_BANNER_JS, null);
                     view.evaluateJavascript(BACK_BTN_JS, null);
                 }
             }
