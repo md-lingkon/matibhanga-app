@@ -47,11 +47,16 @@ jobs:
 
       - name: Apply in-app browser, print and download support
         run: |
+          if [ ! -f native/MainActivity.java ]; then
+            echo "ERROR: native/MainActivity.java রিপোতে নেই — আগে এই ফাইলটি আপলোড করুন"
+            exit 1
+          fi
+          mkdir -p android/app/src/main/java/com/matibhanga/college
           cp native/MainActivity.java android/app/src/main/java/com/matibhanga/college/MainActivity.java
           sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.webkit:webkit:1.10.0"/' android/app/build.gradle
           sed -i 's|<application|<uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n    <application|' android/app/src/main/AndroidManifest.xml
-          grep -n "webkit" android/app/build.gradle
-          grep -n "CAMERA" android/app/src/main/AndroidManifest.xml
+          grep -n "webkit" android/app/build.gradle || true
+          grep -n "CAMERA" android/app/src/main/AndroidManifest.xml || true
 
       - name: Generate app icons
         run: npx capacitor-assets generate --android
