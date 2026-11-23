@@ -38,27 +38,19 @@ public class MainActivity extends BridgeActivity {
     private static final String HOME = "https://localhost/";
     private WebView printView; // সাময়িক প্রিন্ট WebView (GC থেকে বাঁচাতে ধরে রাখা)
 
-    // প্রতিটি পেজ ও ফ্রেমে (GAS-এর ভিতরের ফ্রেমসহ) সবার আগে চলবে
-    private static final String DOC_START_JS =
-        "(function(){" +
-        "if(window.__mbInit||!window.MBAndroid)return;window.__mbInit=true;var A=window.MBAndroid;" +
-        // প্রিন্ট: পেজের বর্তমান HTML নেটিভ প্রিন্টে পাঠায়
-        "window.print=function(){try{A.printHtml(document.title||'document',location.href," +
-        "'<!DOCTYPE html>'+document.documentElement.outerHTML);}catch(e){}};" +
-        // blob ডাউনলোড
-        "var blobs={};var oc=URL.createObjectURL;" +
-        "URL.createObjectURL=function(o){var u=oc.call(URL,o);blobs[u]=o;return u;};" +
-        "function save(name,blob){var r=new FileReader();r.onloadend=function(){var d=String(r.result);" +
-        "A.saveFile(name||'',blob.type||'application/octet-stream',d.substring(d.indexOf(',')+1));};r.readAsDataURL(blob);}" +
-        "function handle(a){var h=a.href||'';var n=a.getAttribute('download')||'';" +
-        "if(h.indexOf('blob:')===0){var b=blobs[h];if(b){save(n,b);}else{fetch(h).then(function(x){return x.blob()}).then(function(b){save(n,b)});}return true;}" +
-        "if(h.indexOf('data:')===0&&a.hasAttribute('download')){fetch(h).then(function(x){return x.blob()}).then(function(b){save(n,b)});return true;}" +
-        "return false;}" +
-        "document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a'):null;" +
-        "if(a&&handle(a)){e.preventDefault();e.stopPropagation();}},true);" +
-        "var ac=HTMLAnchorElement.prototype.click;" +
-        "HTMLAnchorElement.prototype.click=function(){if(handle(this))return;return ac.apply(this,arguments);};" +
-        "})();";
+    private String readAsset(String name) {
+        try {
+            java.io.InputStream in = getAssets().open(name);
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[4096];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            in.close();
+            return out.toString("UTF-8");
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     // অ্যাপের বাইরের (গুগল ইত্যাদি) পেজে ভাসমান "অ্যাপে ফিরুন" বোতাম
     private static final String BACK_BTN_JS =
@@ -77,8 +69,9 @@ public class MainActivity extends BridgeActivity {
         wv.addJavascriptInterface(new NativeHelper(), "MBAndroid");
 
         try {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-                WebViewCompat.addDocumentStartJavaScript(wv, DOC_START_JS, Collections.singleton("*"));
+            String js = readAsset("mb-inject.js");
+            if (js != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+                WebViewCompat.addDocumentStartJavaScript(wv, js, Collections.singleton("*"));
             }
         } catch (Throwable ignored) { }
 
@@ -146,16 +139,33 @@ public class MainActivity extends BridgeActivity {
         public void printHtml(final String title, final String baseUrl, final String html) {
             runOnUiThread(() -> {
                 try {
-                    printView = new WebView(MainActivity.this);
-                    printView.setWebViewClient(new WebViewClient() {
+                    Toast.makeText(MainActivity.this, "প্রিন্ট প্রস্তুত হচ্ছে…", Toast.LENGTH_SHORT).show();
+                    final WebView pv = new WebView(MainActivity.this);
+                    printView = pv;
+                    pv.getSettings().setJavaScriptEnabled(false);
+                    pv.getSettings().setLoadsImagesAutomatically(true);
+                    pv.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+                    pv.setWebViewClient(new WebViewClient() {
+                        private boolean printed = false;
+
                         @Override
-                        public void onPageFinished(WebView view, String url) {
-                            PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
-                            PrintDocumentAdapter adapter = view.createPrintDocumentAdapter(title);
-                            pm.print(title, adapter, new PrintAttributes.Builder().build());
+                        public void onPageFinished(final WebView view, String url) {
+                            if (printed) return;
+                            printed = true;
+                            // ছবি/ফন্ট বসার জন্য একটু অপেক্ষা
+                            view.postDelayed(() -> {
+                                try {
+                                    PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
+                                    PrintDocumentAdapter adapter = view.createPrintDocumentAdapter(title);
+                                    pm.print(title, adapter, new PrintAttributes.Builder()
+                                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
+                                } catch (Exception e) {
+                                    Toast.makeText(MainActivity.this, "প্রিন্ট শুরু করা যায়নি", Toast.LENGTH_SHORT).show();
+                                }
+                            }, 900);
                         }
                     });
-                    printView.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
+                    pv.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "প্রিন্ট শুরু করা যায়নি", Toast.LENGTH_SHORT).show();
                 }
