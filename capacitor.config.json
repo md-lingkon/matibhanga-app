@@ -7,7 +7,9 @@
     "allowNavigation": [
       "script.google.com",
       "*.googleusercontent.com",
-      "*.google.com"
+      "*.google.com",
+      "md-lingkon.github.io",
+      "*.gstatic.com"
     ]
   },
   "android": {
