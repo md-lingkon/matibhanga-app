@@ -46,6 +46,34 @@
       } catch (e) {}
     }
 
+    // CSS রুল (CSSOM) সহ স্টাইল ধরে রাখা — JS দিয়ে বসানো স্টাইলও আসবে
+    try {
+      var os = doc.querySelectorAll('style'), cs = clone.querySelectorAll('style');
+      for (var q = 0; q < os.length; q++) {
+        var sh = os[q].sheet;
+        if (sh && cs[q]) {
+          try {
+            var t = '', rules = sh.cssRules;
+            for (var z = 0; z < rules.length; z++) t += rules[z].cssText + '\n';
+            if (t) cs[q].textContent = t;
+          } catch (e) {}
+        }
+      }
+      if (doc.adoptedStyleSheets && doc.adoptedStyleSheets.length) {
+        var t2 = '';
+        for (var y = 0; y < doc.adoptedStyleSheets.length; y++) {
+          try {
+            var rr = doc.adoptedStyleSheets[y].cssRules;
+            for (var x = 0; x < rr.length; x++) t2 += rr[x].cssText + '\n';
+          } catch (e) {}
+        }
+        if (t2) {
+          var as = doc.createElement('style'); as.textContent = t2;
+          var hd = clone.querySelector('head'); if (hd) hd.appendChild(as);
+        }
+      }
+    } catch (e) {}
+
     // স্ক্রিপ্ট ও CSP সরানো (স্ন্যাপশটে JS চলবে না)
     var rm = clone.querySelectorAll('script,meta[http-equiv="Content-Security-Policy"],meta[http-equiv="content-security-policy"]');
     for (var n = 0; n < rm.length; n++) rm[n].parentNode.removeChild(rm[n]);
@@ -70,16 +98,44 @@
     });
   }
 
+  function textLen(d) {
+    try { return ((d.body && d.body.innerText) || '').replace(/\s+/g, '').length; } catch (e) { return 0; }
+  }
+
+  // নিজের লেখা কম হলে ভিতরের (একই-অরিজিন) ফ্রেমগুলো থেকে সবচেয়ে বেশি লেখাওয়ালাটি নেওয়া
+  function bestDoc(doc) {
+    var best = doc, bestLen = textLen(doc);
+    if (bestLen >= 30) return best;
+    var fr = doc.querySelectorAll('iframe');
+    for (var i = 0; i < fr.length; i++) {
+      try {
+        var d = fr[i].contentDocument;
+        if (d && d.body) {
+          var r = bestDoc(d), l = textLen(r);
+          if (l > bestLen) { best = r; bestLen = l; }
+        }
+      } catch (e) {}
+    }
+    return best;
+  }
+
   function doPrint(doc) {
     doc = doc || document;
-    var base = location.href;
-    try { if (doc.location && doc.location.href && doc.location.href !== 'about:blank') base = doc.location.href; } catch (e) {}
-    var title = (doc.title || document.title || 'document');
-    snapshot(doc).then(function (html) {
-      A.printHtml(title, base, html);
-    }).catch(function () {
-      try { A.printHtml(title, base, '<!DOCTYPE html>' + doc.documentElement.outerHTML); } catch (e) {}
-    });
+    var win = doc.defaultView || window;
+    try { win.dispatchEvent(new Event('beforeprint')); } catch (e) {}
+    setTimeout(function () {
+      var target = bestDoc(doc);
+      var base = location.href;
+      try { if (target.location && target.location.href && target.location.href !== 'about:blank') base = target.location.href; } catch (e) {}
+      var title = (target.title || document.title || 'document');
+      var info = 'লেখা=' + textLen(target) + (target !== doc ? ' (ফ্রেম)' : '');
+      snapshot(target).then(function (html) {
+        A.printHtml(title, base, html, info);
+        try { win.dispatchEvent(new Event('afterprint')); } catch (e) {}
+      }).catch(function () {
+        try { A.printHtml(title, base, '<!DOCTYPE html>' + target.documentElement.outerHTML, info); } catch (e) {}
+      });
+    }, 250);
   }
 
   window.print = function () { doPrint(document); };
