@@ -139,10 +139,8 @@ public class MainActivity extends BridgeActivity {
         public void printHtml(final String title, final String baseUrl, final String html, final String info) {
             runOnUiThread(() -> {
                 try {
-                    Toast.makeText(MainActivity.this, "প্রিন্ট প্রস্তুত হচ্ছে… (" + info + ", " + (html.length() / 1024) + " KB)", Toast.LENGTH_LONG).show();
                     final WebView pv = new WebView(MainActivity.this);
                     printView = pv;
-                    pv.getSettings().setJavaScriptEnabled(true); // স্ক্রিপ্ট স্ন্যাপশট থেকে আগেই সরানো; শুধু পরীক্ষার জন্য
                     pv.getSettings().setLoadsImagesAutomatically(true);
                     pv.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                     final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
@@ -163,8 +161,6 @@ public class MainActivity extends BridgeActivity {
                         @Override
                         public void onPageFinished(WebView view, String url) {
                             // ছবি/ফন্ট বসার জন্য একটু অপেক্ষা (View.postDelayed নয়, কারণ ভিউটি স্ক্রিনে যুক্ত নয়)
-                            view.evaluateJavascript("(function(){var b=document.body;return b?(b.innerText.replace(/\\s/g,'').length+' | '+getComputedStyle(b).display+' | h='+b.scrollHeight):'nobody';})()",
-                                value -> Toast.makeText(MainActivity.this, "প্রিন্ট ভিউ: " + value, Toast.LENGTH_LONG).show());
                             h.postDelayed(doPrint, 900);
                         }
                     });
