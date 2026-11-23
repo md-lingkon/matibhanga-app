@@ -136,10 +136,10 @@ public class MainActivity extends BridgeActivity {
     public class NativeHelper {
 
         @JavascriptInterface
-        public void printHtml(final String title, final String baseUrl, final String html) {
+        public void printHtml(final String title, final String baseUrl, final String html, final String info) {
             runOnUiThread(() -> {
                 try {
-                    Toast.makeText(MainActivity.this, "প্রিন্ট প্রস্তুত হচ্ছে…", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "প্রিন্ট প্রস্তুত হচ্ছে… (" + info + ", " + (html.length() / 1024) + " KB)", Toast.LENGTH_LONG).show();
                     final WebView pv = new WebView(MainActivity.this);
                     printView = pv;
                     pv.getSettings().setJavaScriptEnabled(false);
