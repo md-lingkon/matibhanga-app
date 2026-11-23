@@ -12,7 +12,12 @@
     });
   }
 
+  var stripped = 0;
+
+  function isPrintOnly(mt) { return /print/i.test(mt) && !/screen|all/i.test(mt); }
+
   function snapshot(doc) {
+    stripped = 0;
     var clone = doc.documentElement.cloneNode(true);
 
     // ফর্মের মান ধরে রাখা
@@ -54,7 +59,11 @@
         if (sh && cs[q]) {
           try {
             var t = '', rules = sh.cssRules;
-            for (var z = 0; z < rules.length; z++) t += rules[z].cssText + '\n';
+            for (var z = 0; z < rules.length; z++) {
+              var ru = rules[z];
+              if (ru.type === 4 && isPrintOnly(ru.media.mediaText)) { stripped++; continue; }
+              t += ru.cssText + '\n';
+            }
             if (t) cs[q].textContent = t;
           } catch (e) {}
         }
@@ -73,6 +82,20 @@
         }
       }
     } catch (e) {}
+
+    // শুধু-প্রিন্ট মিডিয়ার স্টাইল/লিংক বাদ (সাইটের প্রিন্ট-CSS পেজ লুকিয়ে ফেললে ফাঁকা আসে)
+    var pm = clone.querySelectorAll('style[media],link[media]');
+    for (var m2 = 0; m2 < pm.length; m2++) {
+      if (isPrintOnly(pm[m2].getAttribute('media') || '')) { pm[m2].parentNode.removeChild(pm[m2]); stripped++; }
+    }
+    // ইনলাইন ইভেন্ট হ্যান্ডলার (onload ইত্যাদি) সরানো
+    var all = clone.querySelectorAll('*');
+    for (var e2 = 0; e2 < all.length; e2++) {
+      var at = all[e2].attributes;
+      for (var f2 = at.length - 1; f2 >= 0; f2--) {
+        if (/^on/i.test(at[f2].name)) all[e2].removeAttribute(at[f2].name);
+      }
+    }
 
     // স্ক্রিপ্ট ও CSP সরানো (স্ন্যাপশটে JS চলবে না)
     var rm = clone.querySelectorAll('script,meta[http-equiv="Content-Security-Policy"],meta[http-equiv="content-security-policy"]');
@@ -130,7 +153,7 @@
       var title = (target.title || document.title || 'document');
       var info = 'লেখা=' + textLen(target) + (target !== doc ? ' (ফ্রেম)' : '');
       snapshot(target).then(function (html) {
-        A.printHtml(title, base, html, info);
+        A.printHtml(title, base, html, info + ' প্রিন্ট-CSS বাদ=' + stripped);
         try { win.dispatchEvent(new Event('afterprint')); } catch (e) {}
       }).catch(function () {
         try { A.printHtml(title, base, '<!DOCTYPE html>' + target.documentElement.outerHTML, info); } catch (e) {}
