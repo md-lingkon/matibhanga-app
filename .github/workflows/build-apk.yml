@@ -6,6 +6,7 @@ on:
     paths:
       - "www/**"
       - "assets/**"
+      - "native/**"
       - "package.json"
       - "capacitor.config.json"
       - ".github/workflows/build-apk.yml"
@@ -43,6 +44,14 @@ jobs:
           sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
           sed -i "s/versionName \"1.0\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
           grep -n "versionCode\|versionName" android/app/build.gradle
+
+      - name: Apply in-app browser, print and download support
+        run: |
+          cp native/MainActivity.java android/app/src/main/java/com/matibhanga/college/MainActivity.java
+          sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.webkit:webkit:1.10.0"/' android/app/build.gradle
+          sed -i 's|<application|<uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n    <application|' android/app/src/main/AndroidManifest.xml
+          grep -n "webkit" android/app/build.gradle
+          grep -n "CAMERA" android/app/src/main/AndroidManifest.xml
 
       - name: Generate app icons
         run: npx capacitor-assets generate --android
