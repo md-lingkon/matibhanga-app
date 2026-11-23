@@ -12,6 +12,7 @@
     });
   }
 
+  var STRIP_PRINT_CSS = false; // সাইটের নিজস্ব প্রিন্ট-CSS রাখা হবে
   var stripped = 0;
 
   function isPrintOnly(mt) { return /print/i.test(mt) && !/screen|all/i.test(mt); }
@@ -77,7 +78,7 @@
             var t = '', rules = sh.cssRules;
             for (var z = 0; z < rules.length; z++) {
               var ru = rules[z];
-              if (ru.type === 4 && isPrintOnly(ru.media.mediaText)) { stripped++; continue; }
+              if (STRIP_PRINT_CSS && ru.type === 4 && isPrintOnly(ru.media.mediaText)) { stripped++; continue; }
               t += ru.cssText + '\n';
             }
             if (t) cs[q].textContent = t;
@@ -102,7 +103,7 @@
     // শুধু-প্রিন্ট মিডিয়ার স্টাইল/লিংক বাদ (সাইটের প্রিন্ট-CSS পেজ লুকিয়ে ফেললে ফাঁকা আসে)
     var pm = clone.querySelectorAll('style[media],link[media]');
     for (var m2 = 0; m2 < pm.length; m2++) {
-      if (isPrintOnly(pm[m2].getAttribute('media') || '')) { pm[m2].parentNode.removeChild(pm[m2]); stripped++; }
+      if (STRIP_PRINT_CSS && isPrintOnly(pm[m2].getAttribute('media') || '')) { pm[m2].parentNode.removeChild(pm[m2]); stripped++; }
     }
     // ইনলাইন ইভেন্ট হ্যান্ডলার (onload ইত্যাদি) সরানো
     var all = clone.querySelectorAll('*');
@@ -162,20 +163,19 @@
   function doPrint(doc) {
     doc = doc || document;
     var win = doc.defaultView || window;
+    // সাইট প্রিন্টের ঠিক আগে কন্টেন্ট বসিয়ে পরে সরিয়ে ফেলে, তাই এখনই (সিঙ্ক্রোনাসলি) কপি নিতে হবে
     try { win.dispatchEvent(new Event('beforeprint')); } catch (e) {}
-    setTimeout(function () {
-      var target = bestDoc(doc);
-      var base = location.href;
-      try { if (target.location && target.location.href && target.location.href !== 'about:blank') base = target.location.href; } catch (e) {}
-      var title = (target.title || document.title || 'document');
-      var info = 'লেখা=' + textLen(target) + (target !== doc ? ' (ফ্রেম)' : '');
-      snapshot(target).then(function (html) {
-        A.printHtml(title, base, html, info + ' প্রিন্ট-CSS বাদ=' + stripped);
-        try { win.dispatchEvent(new Event('afterprint')); } catch (e) {}
-      }).catch(function () {
-        try { A.printHtml(title, base, '<!DOCTYPE html>' + target.documentElement.outerHTML, info); } catch (e) {}
-      });
-    }, 250);
+    var target = bestDoc(doc);
+    var base = location.href;
+    try { if (target.location && target.location.href && target.location.href !== 'about:blank') base = target.location.href; } catch (e) {}
+    var title = (target.title || document.title || 'document');
+    var info = 'লেখা=' + textLen(target) + (target !== doc ? ' (ফ্রেম)' : '');
+    snapshot(target).then(function (html) {
+      A.printHtml(title, base, html, info + ' প্রিন্ট-CSS বাদ=' + stripped);
+    }).catch(function () {
+      try { A.printHtml(title, base, '<!DOCTYPE html>' + target.documentElement.outerHTML, info); } catch (e) {}
+    });
+    try { win.dispatchEvent(new Event('afterprint')); } catch (e) {}
   }
 
   window.print = function () { doPrint(document); };
