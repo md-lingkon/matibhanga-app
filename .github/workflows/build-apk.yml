@@ -53,6 +53,12 @@ jobs:
           fi
           mkdir -p android/app/src/main/java/com/matibhanga/college
           cp native/MainActivity.java android/app/src/main/java/com/matibhanga/college/MainActivity.java
+          if [ ! -f native/mb-inject.js ]; then
+            echo "ERROR: native/mb-inject.js রিপোতে নেই — আগে এই ফাইলটি আপলোড করুন"
+            exit 1
+          fi
+          mkdir -p android/app/src/main/assets
+          cp native/mb-inject.js android/app/src/main/assets/mb-inject.js
           sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.webkit:webkit:1.10.0"/' android/app/build.gradle
           sed -i 's|<application|<uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n    <application|' android/app/src/main/AndroidManifest.xml
           grep -n "webkit" android/app/build.gradle || true
