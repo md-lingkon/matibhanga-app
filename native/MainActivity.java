@@ -145,26 +145,29 @@ public class MainActivity extends BridgeActivity {
                     pv.getSettings().setJavaScriptEnabled(false);
                     pv.getSettings().setLoadsImagesAutomatically(true);
                     pv.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+                    final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+                    final boolean[] printed = {false};
+                    final Runnable doPrint = () -> {
+                        if (printed[0]) return;
+                        printed[0] = true;
+                        try {
+                            PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
+                            PrintDocumentAdapter adapter = pv.createPrintDocumentAdapter(title);
+                            pm.print(title, adapter, new PrintAttributes.Builder()
+                                .setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
+                        } catch (Exception e) {
+                            Toast.makeText(MainActivity.this, "প্রিন্ট শুরু করা যায়নি", Toast.LENGTH_SHORT).show();
+                        }
+                    };
                     pv.setWebViewClient(new WebViewClient() {
-                        private boolean printed = false;
-
                         @Override
-                        public void onPageFinished(final WebView view, String url) {
-                            if (printed) return;
-                            printed = true;
-                            // ছবি/ফন্ট বসার জন্য একটু অপেক্ষা
-                            view.postDelayed(() -> {
-                                try {
-                                    PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
-                                    PrintDocumentAdapter adapter = view.createPrintDocumentAdapter(title);
-                                    pm.print(title, adapter, new PrintAttributes.Builder()
-                                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
-                                } catch (Exception e) {
-                                    Toast.makeText(MainActivity.this, "প্রিন্ট শুরু করা যায়নি", Toast.LENGTH_SHORT).show();
-                                }
-                            }, 900);
+                        public void onPageFinished(WebView view, String url) {
+                            // ছবি/ফন্ট বসার জন্য একটু অপেক্ষা (View.postDelayed নয়, কারণ ভিউটি স্ক্রিনে যুক্ত নয়)
+                            h.postDelayed(doPrint, 900);
                         }
                     });
+                    // নিরাপত্তা: কোনো কারণে onPageFinished না এলেও ৬ সেকেন্ড পরে প্রিন্ট হবে
+                    h.postDelayed(doPrint, 6000);
                     pv.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "প্রিন্ট শুরু করা যায়নি", Toast.LENGTH_SHORT).show();
