@@ -322,14 +322,16 @@ nav button.active .i{filter:none;opacity:1}
   var frame = $("#vFrame"), loadTimer = null, curUrl = "";
   // Google Script পেজ ফ্রেমে খোলে না, তাই সবকিছু আলাদা ট্যাব/ইন-অ্যাপ ব্রাউজারে খোলা হয়
   var USE_IFRAME = false;
+  function isNative(){
+    try{ var C = window.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){ return false; }
+  }
   function openExternal(url){
-    try{
-      var C = window.Capacitor;
-      if(C && C.isNativePlatform && C.isNativePlatform() && C.Plugins && C.Plugins.Browser){
-        C.Plugins.Browser.open({ url: url, presentationStyle: "fullscreen" });
-        return;
-      }
-    }catch(e){}
+    // অ্যাপের ভিতরেই খুলবে (একই WebView-তে)। ফিরতে ভাসমান "← অ্যাপে ফিরুন" বোতাম বা ফোনের ব্যাক বাটন।
+    if(isNative()){
+      try{ sessionStorage.setItem("mbTab", current); }catch(e){}
+      location.href = url;
+      return;
+    }
     var w = window.open(url, "_blank");
     if(!w) location.href = url;
   }
@@ -373,6 +375,12 @@ nav button.active .i{filter:none;opacity:1}
     else if(el.dataset.tab) show(el.dataset.tab);
   });
   $("#backBtn").onclick = function(){ show("home") };
+  // লিংক থেকে ফিরে এলে আগের ট্যাবেই থাকবে
+  try{
+    var savedTab = sessionStorage.getItem("mbTab");
+    if(savedTab && TITLES[savedTab]) show(savedTab);
+    sessionStorage.removeItem("mbTab");
+  }catch(e){}
 
   // ====== লিংক অটো-সিঙ্ক (অফিসিয়াল সাইট থেকে) ======
   // অ্যাপ খুললে অফিসিয়াল সাইটের পেজ পড়ে লিংক নিজে বদলে নেয়। ব্যর্থ হলে উপরের LINKS-ই চলবে।
