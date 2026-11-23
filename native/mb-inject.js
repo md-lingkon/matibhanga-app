@@ -20,6 +20,22 @@
     stripped = 0;
     var clone = doc.documentElement.cloneNode(true);
 
+    // এনিমেশন/ফেড-ইন করা উপাদান: স্ক্রিনে এখন যেমন দেখাচ্ছে (শেষ অবস্থা) সেটাই স্থির করে দেওয়া
+    try {
+      var liveAll = doc.querySelectorAll('*');
+      var cloneAll = clone.querySelectorAll('*');
+      var win2 = doc.defaultView || window;
+      if (liveAll.length === cloneAll.length) {
+        for (var li = 0; li < liveAll.length; li++) {
+          var cs0 = win2.getComputedStyle(liveAll[li]);
+          if (cs0.animationName && cs0.animationName !== 'none') {
+            cloneAll[li].style.cssText += ';animation:none!important;opacity:' + cs0.opacity +
+              '!important;transform:' + cs0.transform + '!important;visibility:' + cs0.visibility + '!important';
+          }
+        }
+      }
+    } catch (e) {}
+
     // ফর্মের মান ধরে রাখা
     var s = doc.querySelectorAll('input,textarea,select');
     var d = clone.querySelectorAll('input,textarea,select');
@@ -104,7 +120,8 @@
     // প্রিন্টে লেখা যেন কেটে না যায়/লুকানো না থাকে
     var st = doc.createElement('style');
     st.textContent = 'html,body{height:auto!important;min-height:0!important;overflow:visible!important;}' +
-      'body{visibility:visible!important;opacity:1!important;}';
+      'body{visibility:visible!important;opacity:1!important;}' +
+      '*{animation-duration:0s!important;animation-delay:0s!important;animation-fill-mode:both!important;transition:none!important;}';
     var head = clone.querySelector('head');
     if (head) head.appendChild(st);
 
