@@ -125,14 +125,14 @@ h3.sec{font-size:14px;color:var(--muted);margin:20px 4px 10px;font-weight:700}
 
 /* Bottom nav */
 nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--card);border-top:1px solid var(--border);
-  display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:linear-gradient(135deg,var(--green-dark),var(--green));
+  display:flex;padding:7px 4px calc(7px + env(safe-area-inset-bottom));
 }
-nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:11px;padding:4px 0}
-nav button .i{font-size:21px;filter:grayscale(1);opacity:.7}
-nav button.active{color:var(--green);font-weight:700}
-nav button.active .i{filter:none;opacity:1}
-@media (prefers-color-scheme: dark){nav button.active{color:#7fe0b9}}
+nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;font-size:11.5px;font-weight:600;padding:2px 0}
+nav button .i{width:42px;height:30px;border-radius:15px;background:#fff;display:grid;place-items:center;font-size:19px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+nav button.active{font-weight:800}
+nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
 
 .footer{text-align:center;color:var(--muted);font-size:11.5px;margin:26px 0 8px}
 .update{display:none;align-items:center;gap:8px;background:#fff3cd;color:#5c4400;padding:10px 14px;font-size:13px;line-height:1.4;border-bottom:1px solid #f0d98a}
@@ -422,6 +422,7 @@ nav button.active .i{filter:none;opacity:1}
     ["routine","class-routine",null],
     ["tutorial","class-tutorial",null],
     ["attendance","class-attendance",null],
+    ["admit","admit-card-panel",function(t){return /admit/i.test(t)}],
     ["qrscan","admit-card-panel",function(t){return /qr|scan/i.test(t)}],
     ["staff","teachers-and-staff",null],
     ["students","essential-link",function(t){return /শিক্ষার্থী তালিকা/.test(t)}],
@@ -462,12 +463,9 @@ nav button.active .i{filter:none;opacity:1}
     var el = $("#latestTitle"); if(el && label) el.textContent = label;
     if(LINKS.result_latest) LINKS.result_latest.t = label;
   }
-  // অ্যাডমিট কার্ডের লিংক অফিসিয়াল সাইট থেকে বদলানো হয় না — নির্ধারিত লিংকেই খুলবে
-  var LOCKED = {admit:1};
   function applyLinks(map){
     for(var k in map){
       if(k === "_latest"){ paintLatest(map[k]); continue; }
-      if(LOCKED[k]) continue;
       if(LINKS[k] && /^https?:\/\//.test(map[k])) LINKS[k].u = map[k];
     }
   }
