@@ -4,6 +4,20 @@ import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,89 +66,139 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
-    // অ্যাপের বাইরের (গুগল ইত্যাদি) পেজে উপরে লোগোসহ বার + নিচে হোম ট্যাব (assets/mb-bars.js থেকে)
-    private static final String BARS_TPL =
-        "(function () {\n" +
-        "  if (document.getElementById('mb-top') || !document.body) return;\n" +
-        "  var HOME = '__HOME__', LOGO = '__LOGO__';\n" +
-        "  var S = document.createElement('style');\n" +
-        "  S.id = 'mb-style';\n" +
-        "  S.textContent =\n" +
-        "    '#mb-top{position:fixed;top:0;left:0;right:0;z-index:2147483647;box-sizing:border-box;' +\n" +
-        "      'background:linear-gradient(135deg,#0a4d39,#0f6b4f);color:#fff;' +\n" +
-        "      'padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;align-items:center;gap:12px;' +\n" +
-        "      'min-height:56px;font-family:sans-serif}' +\n" +
-        "    '#mb-top .l{width:40px;height:40px;border-radius:10px;background:#fff;padding:2px;box-sizing:border-box;flex:none}' +\n" +
-        "    '#mb-top img{width:100%;height:100%;object-fit:contain;display:block}' +\n" +
-        "    '#mb-top b{font-size:17px;font-weight:700;line-height:1.3}' +\n" +
-        "    '#mb-bot{position:fixed;bottom:0;left:0;right:0;z-index:2147483647;box-sizing:border-box;background:#fff;' +\n" +
-        "      'border-top:1px solid #e1e9e5;display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));' +\n" +
-        "      'font-family:sans-serif}' +\n" +
-        "    '#mb-bot button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;' +\n" +
-        "      'color:#6a7b73;font:600 11px sans-serif;padding:4px 0}' +\n" +
-        "    '#mb-bot .i{font-size:21px;line-height:1.2}' +\n" +
-        "    'html.mb-fit{padding-top:var(--mb-t,60px)!important;padding-bottom:var(--mb-b,64px)!important;box-sizing:border-box!important}' +\n" +
-        "    'iframe.mb-fit{top:var(--mb-t,60px)!important;bottom:auto!important;height:calc(100vh - var(--mb-t,60px) - var(--mb-b,64px))!important}' +\n" +
-        "    '@media print{#mb-top,#mb-bot{display:none!important}}';\n" +
-        "  (document.head || document.documentElement).appendChild(S);\n" +
-        "  var top = document.createElement('div');\n" +
-        "  top.id = 'mb-top';\n" +
-        "  var lg = document.createElement('div'); lg.className = 'l';\n" +
-        "  var im = document.createElement('img'); im.src = LOGO; im.alt = '';\n" +
-        "  im.onerror = function () { lg.removeChild(im); lg.style.cssText = 'color:#0f6b4f;font:700 22px sans-serif;display:flex;align-items:center;justify-content:center'; lg.textContent = 'ম'; };\n" +
-        "  lg.appendChild(im);\n" +
-        "  var tt = document.createElement('b'); tt.textContent = 'মাটিভাঙ্গা ডিগ্রি কলেজ';\n" +
-        "  top.appendChild(lg); top.appendChild(tt);\n" +
-        "  var bot = document.createElement('div');\n" +
-        "  bot.id = 'mb-bot';\n" +
-        "  var TABS = [['home','🏠','হোম'],['results','📊','রেজাল্ট'],['classes','📚','ক্লাস'],['staff','👩\\u200D🏫','শিক্ষক'],['contact','📞','যোগাযোগ']];\n" +
-        "  TABS.forEach(function (t) {\n" +
-        "    var b = document.createElement('button');\n" +
-        "    var ic = document.createElement('span'); ic.className = 'i'; ic.textContent = t[1];\n" +
-        "    b.appendChild(ic);\n" +
-        "    b.appendChild(document.createTextNode(t[2]));\n" +
-        "    b.onclick = function () { location.href = HOME + (t[0] === 'home' ? '' : '#' + t[0]); };\n" +
-        "    bot.appendChild(b);\n" +
-        "  });\n" +
-        "  document.body.appendChild(top);\n" +
-        "  document.body.appendChild(bot);\n" +
-        "  function fit() {\n" +
-        "    var root = document.documentElement;\n" +
-        "    root.style.setProperty('--mb-t', top.offsetHeight + 'px');\n" +
-        "    root.style.setProperty('--mb-b', bot.offsetHeight + 'px');\n" +
-        "    root.classList.add('mb-fit');\n" +
-        "    var fr = document.querySelectorAll('iframe');\n" +
-        "    for (var i = 0; i < fr.length; i++) {\n" +
-        "      var f = fr[i];\n" +
-        "      if (f.classList.contains('mb-fit')) continue;\n" +
-        "      try {\n" +
-        "        var cs = getComputedStyle(f);\n" +
-        "        if (cs.position === 'absolute' || cs.position === 'fixed') {\n" +
-        "          var r = f.getBoundingClientRect();\n" +
-        "          if (r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.7) f.classList.add('mb-fit');\n" +
-        "        }\n" +
-        "      } catch (e) {}\n" +
-        "    }\n" +
-        "  }\n" +
-        "  fit();\n" +
-        "  var n = 0, iv = setInterval(function () { fit(); if (++n > 40) clearInterval(iv); }, 500);\n" +
-        "  window.addEventListener('resize', fit);\n" +
-        "})();\n" +
-        "";
+    // ===== নেটিভ উপরের বার (লোগোসহ) ও নিচের ট্যাব বার — বাইরের পেজে সবসময় দেখাবে =====
+    private LinearLayout topBar, bottomWrap;
 
-    private String barsJs = null;
+    private int dp(int v) {
+        return (int) (v * getResources().getDisplayMetrics().density + 0.5f);
+    }
 
-    private String readAssetBase64(String name) {
+    private Bitmap loadLogo() {
+        String[] names = {"public/icon-192.png", "public/icon-512.png", "public/icon.png"};
+        for (String n : names) {
+            try {
+                java.io.InputStream in = getAssets().open(n);
+                Bitmap bm = BitmapFactory.decodeStream(in);
+                in.close();
+                if (bm != null) return bm;
+            } catch (Exception ignored) { }
+        }
+        return null;
+    }
+
+    private void setBars(boolean show) {
+        int vis = show ? View.VISIBLE : View.GONE;
+        if (topBar != null) topBar.setVisibility(vis);
+        if (bottomWrap != null) bottomWrap.setVisibility(vis);
+    }
+
+    private void goTab(WebView wv, String tab) {
+        wv.loadUrl(tab.equals("home") ? HOME : HOME + "#" + tab);
+    }
+
+    private void setupNativeBars(final WebView wv) {
         try {
-            java.io.InputStream in = getAssets().open(name);
-            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[4096];
-            int n;
-            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-            in.close();
-            return Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
-        } catch (Exception e) {
-            return null;
+            final ViewGroup parent = (ViewGroup) wv.getParent();
+            final int index = parent.indexOfChild(wv);
+            parent.removeView(wv);
+
+            final LinearLayout root = new LinearLayout(this);
+            root.setOrientation(LinearLayout.VERTICAL);
+
+            // উপরের বার
+            topBar = new LinearLayout(this);
+            topBar.setOrientation(LinearLayout.HORIZONTAL);
+            topBar.setGravity(Gravity.CENTER_VERTICAL);
+            GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{0xFF0A4D39, 0xFF0F6B4F});
+            topBar.setBackground(gd);
+            topBar.setPadding(dp(16), dp(10), dp(16), dp(10));
+
+            ImageView logo = new ImageView(this);
+            GradientDrawable white = new GradientDrawable();
+            white.setColor(Color.WHITE);
+            white.setCornerRadius(dp(10));
+            logo.setBackground(white);
+            logo.setPadding(dp(2), dp(2), dp(2), dp(2));
+            logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            Bitmap bm = loadLogo();
+            if (bm != null) logo.setImageBitmap(bm);
+            topBar.addView(logo, new LinearLayout.LayoutParams(dp(40), dp(40)));
+
+            TextView title = new TextView(this);
+            title.setText("মাটিভাঙ্গা ডিগ্রি কলেজ");
+            title.setTextColor(Color.WHITE);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+            title.setTypeface(null, Typeface.BOLD);
+            LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            tlp.leftMargin = dp(12);
+            topBar.addView(title, tlp);
+
+            // নিচের ট্যাব বার
+            bottomWrap = new LinearLayout(this);
+            bottomWrap.setOrientation(LinearLayout.VERTICAL);
+            bottomWrap.setBackgroundColor(Color.WHITE);
+            View line = new View(this);
+            line.setBackgroundColor(0xFFE1E9E5);
+            bottomWrap.addView(line, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setPadding(dp(4), dp(6), dp(4), dp(6));
+            String[][] tabs = {
+                {"home", "\uD83C\uDFE0", "হোম"},
+                {"results", "\uD83D\uDCCA", "রেজাল্ট"},
+                {"classes", "\uD83D\uDCDA", "ক্লাস"},
+                {"staff", "\uD83D\uDC69\u200D\uD83C\uDFEB", "শিক্ষক"},
+                {"contact", "\uD83D\uDCDE", "যোগাযোগ"}
+            };
+            for (final String[] t : tabs) {
+                LinearLayout item = new LinearLayout(this);
+                item.setOrientation(LinearLayout.VERTICAL);
+                item.setGravity(Gravity.CENTER_HORIZONTAL);
+                item.setPadding(0, dp(4), 0, dp(4));
+                TextView ic = new TextView(this);
+                ic.setText(t[1]);
+                ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
+                ic.setGravity(Gravity.CENTER);
+                TextView lb = new TextView(this);
+                lb.setText(t[2]);
+                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                lb.setTextColor(0xFF6A7B73);
+                lb.setGravity(Gravity.CENTER);
+                item.addView(ic, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                item.addView(lb, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                item.setOnClickListener(v -> goTab(wv, t[0]));
+                row.addView(item, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            }
+            bottomWrap.addView(row, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            root.addView(topBar, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            root.addView(wv, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+            root.addView(bottomWrap, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            parent.addView(root, index, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            // স্ট্যাটাস বার/নেভিগেশন বারের জায়গা (এজ-টু-এজ হলে)
+            ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+                Insets sb = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                topBar.setPadding(dp(16), dp(10) + sb.top, dp(16), dp(10));
+                bottomWrap.setPadding(0, 0, 0, sb.bottom);
+                return insets;
+            });
+            ViewCompat.requestApplyInsets(root);
+
+            setBars(false); // শুরুতে হোম পেজ — হোমের নিজস্ব বার আছে
+        } catch (Throwable t) {
+            topBar = null;
+            bottomWrap = null;
         }
     }
 
@@ -155,12 +219,7 @@ public class MainActivity extends BridgeActivity {
 
         wv.addJavascriptInterface(new NativeHelper(), "MBAndroid");
 
-        String tpl = BARS_TPL;
-        {
-            String b64 = readAssetBase64("public/icon-192.png");
-            String logo = (b64 != null) ? "data:image/png;base64," + b64 : HOME + "icon-192.png";
-            barsJs = tpl.replace("__HOME__", HOME).replace("__LOGO__", logo);
-        }
+        setupNativeBars(wv);
 
         try {
             String js = readAsset("mb-inject.js");
@@ -176,7 +235,8 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                if (url != null && url.startsWith(HOME)) clearHistoryNext = true;
+                if (url != null && url.startsWith(HOME)) { clearHistoryNext = true; setBars(false); }
+                else if (url != null && url.startsWith("http")) setBars(true);
             }
 
             @Override
@@ -187,7 +247,6 @@ public class MainActivity extends BridgeActivity {
                     if (clearHistoryNext) { view.clearHistory(); clearHistoryNext = false; }
                 } else if (url.startsWith("http")) {
                     view.evaluateJavascript(HIDE_BANNER_JS, null);
-                    if (barsJs != null) view.evaluateJavascript(barsJs, null);
                 }
             }
         });
