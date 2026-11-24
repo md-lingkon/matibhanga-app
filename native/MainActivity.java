@@ -52,13 +52,22 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
-    // অ্যাপের বাইরের (গুগল ইত্যাদি) পেজে ভাসমান "অ্যাপে ফিরুন" বোতাম
-    private static final String BACK_BTN_JS =
-        "(function(){if(document.getElementById('mb-back')||!document.body)return;" +
-        "var b=document.createElement('div');b.id='mb-back';b.textContent='\u2190 \u0985\u09CD\u09AF\u09BE\u09AA\u09C7 \u09AB\u09BF\u09B0\u09C1\u09A8';" +
-        "b.style.cssText='position:fixed;left:12px;bottom:18px;z-index:2147483647;background:#0f6b4f;color:#fff;" +
-        "padding:10px 16px;border-radius:24px;font:600 14px sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.4);opacity:.92';" +
-        "b.onclick=function(){location.href='" + HOME + "';};document.body.appendChild(b);})();";
+    // অ্যাপের বাইরের (গুগল ইত্যাদি) পেজে উপরে লোগোসহ বার + নিচে হোম ট্যাব (assets/mb-bars.js থেকে)
+    private String barsJs = null;
+
+    private String readAssetBase64(String name) {
+        try {
+            java.io.InputStream in = getAssets().open(name);
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[4096];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            in.close();
+            return Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     // গুগলের "This application was created by a Google Apps Script user" ব্যানার লুকানো
     private static final String HIDE_BANNER_JS =
@@ -76,6 +85,13 @@ public class MainActivity extends BridgeActivity {
         final WebView wv = getBridge().getWebView();
 
         wv.addJavascriptInterface(new NativeHelper(), "MBAndroid");
+
+        String tpl = readAsset("mb-bars.js");
+        if (tpl != null) {
+            String b64 = readAssetBase64("public/icon-192.png");
+            String logo = (b64 != null) ? "data:image/png;base64," + b64 : HOME + "icon-192.png";
+            barsJs = tpl.replace("__HOME__", HOME).replace("__LOGO__", logo);
+        }
 
         try {
             String js = readAsset("mb-inject.js");
@@ -102,7 +118,7 @@ public class MainActivity extends BridgeActivity {
                     if (clearHistoryNext) { view.clearHistory(); clearHistoryNext = false; }
                 } else if (url.startsWith("http")) {
                     view.evaluateJavascript(HIDE_BANNER_JS, null);
-                    view.evaluateJavascript(BACK_BTN_JS, null);
+                    if (barsJs != null) view.evaluateJavascript(barsJs, null);
                 }
             }
         });
