@@ -53,6 +53,75 @@ public class MainActivity extends BridgeActivity {
     }
 
     // অ্যাপের বাইরের (গুগল ইত্যাদি) পেজে উপরে লোগোসহ বার + নিচে হোম ট্যাব (assets/mb-bars.js থেকে)
+    private static final String BARS_TPL =
+        "(function () {\n" +
+        "  if (document.getElementById('mb-top') || !document.body) return;\n" +
+        "  var HOME = '__HOME__', LOGO = '__LOGO__';\n" +
+        "  var S = document.createElement('style');\n" +
+        "  S.id = 'mb-style';\n" +
+        "  S.textContent =\n" +
+        "    '#mb-top{position:fixed;top:0;left:0;right:0;z-index:2147483647;box-sizing:border-box;' +\n" +
+        "      'background:linear-gradient(135deg,#0a4d39,#0f6b4f);color:#fff;' +\n" +
+        "      'padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;align-items:center;gap:12px;' +\n" +
+        "      'min-height:56px;font-family:sans-serif}' +\n" +
+        "    '#mb-top .l{width:40px;height:40px;border-radius:10px;background:#fff;padding:2px;box-sizing:border-box;flex:none}' +\n" +
+        "    '#mb-top img{width:100%;height:100%;object-fit:contain;display:block}' +\n" +
+        "    '#mb-top b{font-size:17px;font-weight:700;line-height:1.3}' +\n" +
+        "    '#mb-bot{position:fixed;bottom:0;left:0;right:0;z-index:2147483647;box-sizing:border-box;background:#fff;' +\n" +
+        "      'border-top:1px solid #e1e9e5;display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));' +\n" +
+        "      'font-family:sans-serif}' +\n" +
+        "    '#mb-bot button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;' +\n" +
+        "      'color:#6a7b73;font:600 11px sans-serif;padding:4px 0}' +\n" +
+        "    '#mb-bot .i{font-size:21px;line-height:1.2}' +\n" +
+        "    'html.mb-fit{padding-top:var(--mb-t,60px)!important;padding-bottom:var(--mb-b,64px)!important;box-sizing:border-box!important}' +\n" +
+        "    'iframe.mb-fit{top:var(--mb-t,60px)!important;bottom:auto!important;height:calc(100vh - var(--mb-t,60px) - var(--mb-b,64px))!important}' +\n" +
+        "    '@media print{#mb-top,#mb-bot{display:none!important}}';\n" +
+        "  (document.head || document.documentElement).appendChild(S);\n" +
+        "  var top = document.createElement('div');\n" +
+        "  top.id = 'mb-top';\n" +
+        "  var lg = document.createElement('div'); lg.className = 'l';\n" +
+        "  var im = document.createElement('img'); im.src = LOGO; im.alt = '';\n" +
+        "  im.onerror = function () { lg.removeChild(im); lg.style.cssText = 'color:#0f6b4f;font:700 22px sans-serif;display:flex;align-items:center;justify-content:center'; lg.textContent = 'ম'; };\n" +
+        "  lg.appendChild(im);\n" +
+        "  var tt = document.createElement('b'); tt.textContent = 'মাটিভাঙ্গা ডিগ্রি কলেজ';\n" +
+        "  top.appendChild(lg); top.appendChild(tt);\n" +
+        "  var bot = document.createElement('div');\n" +
+        "  bot.id = 'mb-bot';\n" +
+        "  var TABS = [['home','🏠','হোম'],['results','📊','রেজাল্ট'],['classes','📚','ক্লাস'],['staff','👩\\u200D🏫','শিক্ষক'],['contact','📞','যোগাযোগ']];\n" +
+        "  TABS.forEach(function (t) {\n" +
+        "    var b = document.createElement('button');\n" +
+        "    var ic = document.createElement('span'); ic.className = 'i'; ic.textContent = t[1];\n" +
+        "    b.appendChild(ic);\n" +
+        "    b.appendChild(document.createTextNode(t[2]));\n" +
+        "    b.onclick = function () { location.href = HOME + (t[0] === 'home' ? '' : '#' + t[0]); };\n" +
+        "    bot.appendChild(b);\n" +
+        "  });\n" +
+        "  document.body.appendChild(top);\n" +
+        "  document.body.appendChild(bot);\n" +
+        "  function fit() {\n" +
+        "    var root = document.documentElement;\n" +
+        "    root.style.setProperty('--mb-t', top.offsetHeight + 'px');\n" +
+        "    root.style.setProperty('--mb-b', bot.offsetHeight + 'px');\n" +
+        "    root.classList.add('mb-fit');\n" +
+        "    var fr = document.querySelectorAll('iframe');\n" +
+        "    for (var i = 0; i < fr.length; i++) {\n" +
+        "      var f = fr[i];\n" +
+        "      if (f.classList.contains('mb-fit')) continue;\n" +
+        "      try {\n" +
+        "        var cs = getComputedStyle(f);\n" +
+        "        if (cs.position === 'absolute' || cs.position === 'fixed') {\n" +
+        "          var r = f.getBoundingClientRect();\n" +
+        "          if (r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.7) f.classList.add('mb-fit');\n" +
+        "        }\n" +
+        "      } catch (e) {}\n" +
+        "    }\n" +
+        "  }\n" +
+        "  fit();\n" +
+        "  var n = 0, iv = setInterval(function () { fit(); if (++n > 40) clearInterval(iv); }, 500);\n" +
+        "  window.addEventListener('resize', fit);\n" +
+        "})();\n" +
+        "";
+
     private String barsJs = null;
 
     private String readAssetBase64(String name) {
@@ -86,8 +155,8 @@ public class MainActivity extends BridgeActivity {
 
         wv.addJavascriptInterface(new NativeHelper(), "MBAndroid");
 
-        String tpl = readAsset("mb-bars.js");
-        if (tpl != null) {
+        String tpl = BARS_TPL;
+        {
             String b64 = readAssetBase64("public/icon-192.png");
             String logo = (b64 != null) ? "data:image/png;base64," + b64 : HOME + "icon-192.png";
             barsJs = tpl.replace("__HOME__", HOME).replace("__LOGO__", logo);
