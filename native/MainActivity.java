@@ -154,7 +154,7 @@ public class MainActivity extends BridgeActivity {
 
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
-            row.setPadding(dp(4), dp(6), dp(4), dp(6));
+            row.setPadding(dp(4), dp(10), dp(4), dp(12));
             String[][] tabs = {
                 {"home", "\uD83C\uDFE0", "হোম"},
                 {"results", "\uD83D\uDCCA", "রেজাল্ট"},
@@ -167,25 +167,29 @@ public class MainActivity extends BridgeActivity {
                 item.setOrientation(LinearLayout.VERTICAL);
                 item.setGravity(Gravity.CENTER_HORIZONTAL);
                 item.setPadding(0, dp(2), 0, dp(2));
+                item.setMinimumHeight(dp(60));
                 item.setAlpha(1f);
                 TextView ic = new TextView(this);
                 ic.setText(t[1]);
-                ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
+                ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
                 ic.setGravity(Gravity.CENTER);
                 GradientDrawable pill = new GradientDrawable();
                 pill.setColor(Color.WHITE);
-                pill.setCornerRadius(dp(15));
+                pill.setCornerRadius(dp(17));
                 ic.setBackground(pill);
                 TextView lb = new TextView(this);
                 lb.setText(t[2]);
-                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                lb.setIncludeFontPadding(true);
+                lb.setPadding(0, dp(4), 0, dp(2));
+                lb.setSingleLine(true);
                 lb.setTextColor(0xFFFFFFFF);
                 lb.setTypeface(null, Typeface.BOLD);
                 lb.setShadowLayer(3f, 0f, 1f, 0x66000000);
                 lb.setAlpha(1f);
                 ic.setAlpha(1f);
                 lb.setGravity(Gravity.CENTER);
-                item.addView(ic, new LinearLayout.LayoutParams(dp(42), dp(30)));
+                item.addView(ic, new LinearLayout.LayoutParams(dp(50), dp(34)));
                 item.addView(lb, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 item.setOnClickListener(v -> goTab(wv, t[0]));
