@@ -146,15 +146,13 @@ public class MainActivity extends BridgeActivity {
             bottomWrap.setOrientation(LinearLayout.VERTICAL);
             bottomWrap.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 new int[]{0xFF0A4D39, 0xFF0F6B4F}));
-            bottomWrap.setAlpha(1f);
-            bottomWrap.setElevation(dp(8));
             View line = new View(this);
             line.setBackgroundColor(0x00000000);
             bottomWrap.addView(line, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
 
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
-            row.setPadding(dp(4), dp(10), dp(4), dp(12));
+            row.setPadding(dp(4), dp(6), dp(4), dp(6));
             String[][] tabs = {
                 {"home", "\uD83C\uDFE0", "হোম"},
                 {"results", "\uD83D\uDCCA", "রেজাল্ট"},
@@ -166,30 +164,22 @@ public class MainActivity extends BridgeActivity {
                 LinearLayout item = new LinearLayout(this);
                 item.setOrientation(LinearLayout.VERTICAL);
                 item.setGravity(Gravity.CENTER_HORIZONTAL);
-                item.setPadding(0, dp(2), 0, dp(2));
-                item.setMinimumHeight(dp(60));
-                item.setAlpha(1f);
+                item.setPadding(0, dp(4), 0, dp(4));
                 TextView ic = new TextView(this);
                 ic.setText(t[1]);
-                ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
+                ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
                 ic.setGravity(Gravity.CENTER);
                 GradientDrawable pill = new GradientDrawable();
                 pill.setColor(Color.WHITE);
-                pill.setCornerRadius(dp(17));
+                pill.setCornerRadius(dp(15));
                 ic.setBackground(pill);
                 TextView lb = new TextView(this);
                 lb.setText(t[2]);
-                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-                lb.setIncludeFontPadding(true);
-                lb.setPadding(0, dp(4), 0, dp(2));
-                lb.setSingleLine(true);
+                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
                 lb.setTextColor(0xFFFFFFFF);
                 lb.setTypeface(null, Typeface.BOLD);
-                lb.setShadowLayer(3f, 0f, 1f, 0x66000000);
-                lb.setAlpha(1f);
-                ic.setAlpha(1f);
                 lb.setGravity(Gravity.CENTER);
-                item.addView(ic, new LinearLayout.LayoutParams(dp(50), dp(34)));
+                item.addView(ic, new LinearLayout.LayoutParams(dp(42), dp(30)));
                 item.addView(lb, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 item.setOnClickListener(v -> goTab(wv, t[0]));
