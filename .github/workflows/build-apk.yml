@@ -75,8 +75,12 @@ jobs:
           KS: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           if [ -n "$KS" ]; then
-            mkdir -p ~/.android
-            echo "$KS" | base64 -d > ~/.android/debug.keystore
+            echo "$KS" | base64 -d > "$GITHUB_WORKSPACE/signing.keystore"
+            echo "==== সিক্রেটের কী-এর পরিচয় ===="
+            keytool -list -v -keystore "$GITHUB_WORKSPACE/signing.keystore" -storepass android | grep -E "Alias name|Owner|SHA256" || { echo "ERROR: কী পড়া যায়নি — সিক্রেটটি আবার বসান"; exit 1; }
+            # গ্র্যাডলকে এই কী-ই ব্যবহার করতে বাধ্য করা (নিজে নতুন কী বানাতে পারবে না)
+            sed -i "0,/^android {/s|^android {|android {\n    signingConfigs {\n        debug {\n            storeFile file('$GITHUB_WORKSPACE/signing.keystore')\n            storePassword 'android'\n            keyAlias 'androiddebugkey'\n            keyPassword 'android'\n        }\n    }|" android/app/build.gradle
+            grep -n -A8 "signingConfigs" android/app/build.gradle || { echo "ERROR: build.gradle-এ সাইনিং বসেনি"; exit 1; }
             echo "স্থায়ী সাইনিং কী ব্যবহার হচ্ছে"
           else
             echo "KEYSTORE_BASE64 সেট করা নেই — সাময়িক কী ব্যবহার হবে"
