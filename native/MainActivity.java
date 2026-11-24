@@ -146,6 +146,8 @@ public class MainActivity extends BridgeActivity {
             bottomWrap.setOrientation(LinearLayout.VERTICAL);
             bottomWrap.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 new int[]{0xFF0A4D39, 0xFF0F6B4F}));
+            bottomWrap.setAlpha(1f);
+            bottomWrap.setElevation(dp(8));
             View line = new View(this);
             line.setBackgroundColor(0x00000000);
             bottomWrap.addView(line, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
@@ -164,7 +166,8 @@ public class MainActivity extends BridgeActivity {
                 LinearLayout item = new LinearLayout(this);
                 item.setOrientation(LinearLayout.VERTICAL);
                 item.setGravity(Gravity.CENTER_HORIZONTAL);
-                item.setPadding(0, dp(4), 0, dp(4));
+                item.setPadding(0, dp(2), 0, dp(2));
+                item.setAlpha(1f);
                 TextView ic = new TextView(this);
                 ic.setText(t[1]);
                 ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
@@ -175,9 +178,12 @@ public class MainActivity extends BridgeActivity {
                 ic.setBackground(pill);
                 TextView lb = new TextView(this);
                 lb.setText(t[2]);
-                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
                 lb.setTextColor(0xFFFFFFFF);
                 lb.setTypeface(null, Typeface.BOLD);
+                lb.setShadowLayer(3f, 0f, 1f, 0x66000000);
+                lb.setAlpha(1f);
+                ic.setAlpha(1f);
                 lb.setGravity(Gravity.CENTER);
                 item.addView(ic, new LinearLayout.LayoutParams(dp(42), dp(30)));
                 item.addView(lb, new LinearLayout.LayoutParams(
