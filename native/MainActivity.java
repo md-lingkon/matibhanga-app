@@ -92,6 +92,12 @@ public class MainActivity extends BridgeActivity {
         if (bottomWrap != null) bottomWrap.setVisibility(vis);
     }
 
+    private void updateBars(String url) {
+        if (url == null) return;
+        if (url.startsWith(HOME)) setBars(false);
+        else if (url.startsWith("http")) setBars(true);
+    }
+
     private void goTab(WebView wv, String tab) {
         wv.loadUrl(tab.equals("home") ? HOME : HOME + "#" + tab);
     }
@@ -235,14 +241,21 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                if (url != null && url.startsWith(HOME)) { clearHistoryNext = true; setBars(false); }
-                else if (url != null && url.startsWith("http")) setBars(true);
+                if (url != null && url.startsWith(HOME)) clearHistoryNext = true;
+            }
+
+            // নতুন পেজ পর্দায় ফুটে ওঠার পরেই বার দেখানো/লুকানো — আগে করলে হোমের বারের সাথে দুইবার দেখায়
+            @Override
+            public void onPageCommitVisible(WebView view, String url) {
+                super.onPageCommitVisible(view, url);
+                updateBars(url);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 if (url == null) return;
+                updateBars(url);
                 if (url.startsWith(HOME)) {
                     if (clearHistoryNext) { view.clearHistory(); clearHistoryNext = false; }
                 } else if (url.startsWith("http")) {
@@ -323,6 +336,21 @@ public class MainActivity extends BridgeActivity {
                     pv.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "প্রিন্ট শুরু করা যায়নি", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void shareText(final String title, final String text) {
+            runOnUiThread(() -> {
+                try {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("text/plain");
+                    i.putExtra(Intent.EXTRA_SUBJECT, title);
+                    i.putExtra(Intent.EXTRA_TEXT, text);
+                    startActivity(Intent.createChooser(i, title));
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "শেয়ার করা যায়নি", Toast.LENGTH_SHORT).show();
                 }
             });
         }
