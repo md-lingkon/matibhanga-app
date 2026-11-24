@@ -144,9 +144,10 @@ public class MainActivity extends BridgeActivity {
             // নিচের ট্যাব বার
             bottomWrap = new LinearLayout(this);
             bottomWrap.setOrientation(LinearLayout.VERTICAL);
-            bottomWrap.setBackgroundColor(Color.WHITE);
+            bottomWrap.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{0xFF0A4D39, 0xFF0F6B4F}));
             View line = new View(this);
-            line.setBackgroundColor(0xFFE1E9E5);
+            line.setBackgroundColor(0x00000000);
             bottomWrap.addView(line, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
 
             LinearLayout row = new LinearLayout(this);
@@ -171,7 +172,7 @@ public class MainActivity extends BridgeActivity {
                 TextView lb = new TextView(this);
                 lb.setText(t[2]);
                 lb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-                lb.setTextColor(0xFF6A7B73);
+                lb.setTextColor(0xFFFFFFFF);
                 lb.setGravity(Gravity.CENTER);
                 item.addView(ic, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
