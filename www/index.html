@@ -381,6 +381,11 @@ nav button.active .i{filter:none;opacity:1}
     if(savedTab && TITLES[savedTab]) show(savedTab);
     sessionStorage.removeItem("mbTab");
   }catch(e){}
+  // বাইরের পেজের নিচের বার থেকে এলে (#results, #classes ...) সেই ট্যাব খোলা
+  try{
+    var hTab = (location.hash||"").replace("#","");
+    if(hTab && TITLES[hTab]) show(hTab);
+  }catch(e){}
 
   // ====== লিংক অটো-সিঙ্ক (অফিসিয়াল সাইট থেকে) ======
   // অ্যাপ খুললে অফিসিয়াল সাইটের পেজ পড়ে লিংক নিজে বদলে নেয়। ব্যর্থ হলে উপরের LINKS-ই চলবে।
