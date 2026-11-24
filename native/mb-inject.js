@@ -114,6 +114,15 @@
       }
     }
 
+    // অ্যাপের উপরের বার/নিচের হোম ট্যাব প্রিন্টে যাবে না
+    ['mb-top','mb-bot','mb-style'].forEach(function (id) {
+      var el = clone.querySelector('#' + id);
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+    clone.classList.remove('mb-fit');
+    var mf = clone.querySelectorAll('.mb-fit');
+    for (var mi = 0; mi < mf.length; mi++) mf[mi].classList.remove('mb-fit');
+
     // স্ক্রিপ্ট ও CSP সরানো (স্ন্যাপশটে JS চলবে না)
     var rm = clone.querySelectorAll('script,meta[http-equiv="Content-Security-Policy"],meta[http-equiv="content-security-policy"]');
     for (var n = 0; n < rm.length; n++) rm[n].parentNode.removeChild(rm[n]);
