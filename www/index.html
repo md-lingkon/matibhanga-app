@@ -54,6 +54,7 @@ main{max-width:720px;margin:0 auto;padding:14px}
   color:#fff;border-radius:20px;padding:22px 18px;position:relative;overflow:hidden;box-shadow:var(--shadow);
 }
 .hero::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.1)}
+.hero{text-align:center}
 .hero small{opacity:.85;font-size:12px;letter-spacing:.3px}
 .hero h2{margin:6px 0 4px;font-size:24px;line-height:1.3}
 .hero p{margin:0;font-size:13px;opacity:.92}
@@ -124,14 +125,13 @@ h3.sec{font-size:14px;color:var(--muted);margin:20px 4px 10px;font-weight:700}
 
 /* Bottom nav */
 nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--card);border-top:1px solid var(--border);
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:linear-gradient(135deg,var(--green-dark),var(--green));
   display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
 }
-nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:11px;padding:4px 0}
-nav button .i{font-size:21px;filter:grayscale(1);opacity:.7}
-nav button.active{color:var(--green);font-weight:700}
-nav button.active .i{filter:none;opacity:1}
-@media (prefers-color-scheme: dark){nav button.active{color:#7fe0b9}}
+nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;color:rgba(255,255,255,.78);font-size:11px;padding:4px 0;border-radius:12px;margin:0 2px}
+nav button .i{font-size:21px}
+nav button.active{color:#fff;font-weight:700;background:rgba(255,255,255,.18)}
 
 .footer{text-align:center;color:var(--muted);font-size:11.5px;margin:26px 0 8px}
 .update{display:none;align-items:center;gap:8px;background:#fff3cd;color:#5c4400;padding:10px 14px;font-size:13px;line-height:1.4;border-bottom:1px solid #f0d98a}
@@ -191,7 +191,7 @@ nav button.active .i{filter:none;opacity:1}
     <div class="highlight">
       <div class="tag">সর্বশেষ প্রকাশিত রেজাল্ট</div>
       <h3 id="latestTitle">বার্ষিক পরীক্ষা (Year Final) — ২০২৫-২৬</h3>
-      <p>অফিসিয়ালি প্রকাশিত রেজাল্ট।</p>
+      <p>অফিসিয়াল সাইটের সর্বশেষ প্রকাশিত রেজাল্ট।</p>
       <button class="btn" data-open="result_latest">রেজাল্ট দেখুন</button>
     </div>
 
@@ -421,7 +421,6 @@ nav button.active .i{filter:none;opacity:1}
     ["routine","class-routine",null],
     ["tutorial","class-tutorial",null],
     ["attendance","class-attendance",null],
-    ["admit","admit-card-panel",function(t){return /admit/i.test(t)}],
     ["qrscan","admit-card-panel",function(t){return /qr|scan/i.test(t)}],
     ["staff","teachers-and-staff",null],
     ["students","essential-link",function(t){return /শিক্ষার্থী তালিকা/.test(t)}],
@@ -462,9 +461,12 @@ nav button.active .i{filter:none;opacity:1}
     var el = $("#latestTitle"); if(el && label) el.textContent = label;
     if(LINKS.result_latest) LINKS.result_latest.t = label;
   }
+  // অ্যাডমিট কার্ডের লিংক অফিসিয়াল সাইট থেকে বদলানো হয় না — নির্ধারিত লিংকেই খুলবে
+  var LOCKED = {admit:1};
   function applyLinks(map){
     for(var k in map){
       if(k === "_latest"){ paintLatest(map[k]); continue; }
+      if(LOCKED[k]) continue;
       if(LINKS[k] && /^https?:\/\//.test(map[k])) LINKS[k].u = map[k];
     }
   }
