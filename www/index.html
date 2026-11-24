@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f6b4f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="মাটিভাঙ্গা ডিগ্রি কলেজ">
+<title>মাটিভাঙ্গা ডিগ্রি কলেজ</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --green:#0f6b4f; --green-dark:#0a4d39; --green-soft:#e6f4ee;
+  --gold:#d9a521; --bg:#f4f7f6; --card:#fff; --text:#1c2b25; --muted:#6a7b73;
+  --border:#e1e9e5; --shadow:0 2px 10px rgba(15,107,79,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0e1714; --card:#16231e; --text:#e8f1ed; --muted:#8ea39a; --border:#25362f; --green-soft:#17332a; --shadow:none}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Noto Sans Bengali","Kalpurush","SolaimanLipi",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);
+  padding-bottom:calc(92px + env(safe-area-inset-bottom));
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+
+/* Top bar */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(135deg,var(--green-dark),var(--green));
+  color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  display:flex;align-items:center;gap:12px;min-height:56px;
+}
+.topbar h1{font-size:17px;margin:0;font-weight:700;flex:1}
+.topbar .back{background:rgba(255,255,255,.15);border:0;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;display:none}
+.topbar .logo{width:40px;height:40px;border-radius:10px;background:#fff;display:grid;place-items:center;overflow:hidden;padding:2px}
+.topbar .logo img{width:100%;height:100%;object-fit:contain;display:block}
+.topbar .install{background:var(--gold);color:#3a2a00;border:0;border-radius:18px;padding:6px 12px;font-size:12px;font-weight:700;display:none}
+
+main{max-width:720px;margin:0 auto;padding:14px}
+.view{display:none;animation:fade .2s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Hero */
+.hero{
+  background:linear-gradient(135deg,var(--green),#17a074);
+  color:#fff;border-radius:20px;padding:22px 18px;position:relative;overflow:hidden;box-shadow:var(--shadow);
+}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.1)}
+.hero{text-align:center}
+.hero small{opacity:.85;font-size:12px;letter-spacing:.3px}
+.hero h2{margin:6px 0 4px;font-size:24px;line-height:1.3}
+.hero p{margin:0;font-size:13px;opacity:.92}
+.badge{display:inline-block;margin-top:12px;background:rgba(255,255,255,.2);border-radius:14px;padding:4px 12px;font-size:12px}
+
+/* Result highlight */
+.highlight{
+  margin-top:14px;background:var(--card);border:1px solid var(--border);border-left:5px solid var(--gold);
+  border-radius:16px;padding:14px;box-shadow:var(--shadow);
+}
+.highlight .tag{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.4px}
+.highlight h3{margin:4px 0 2px;font-size:16px}
+.highlight p{margin:0 0 10px;color:var(--muted);font-size:13px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--green);color:#fff;border:0;border-radius:12px;padding:10px 16px;font-weight:600;font-size:14px;
+}
+.btn.ghost{background:var(--green-soft);color:var(--green)}
+@media (prefers-color-scheme: dark){.btn.ghost{color:#7fe0b9}}
+
+h3.sec{font-size:14px;color:var(--muted);margin:20px 4px 10px;font-weight:700}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;box-shadow:var(--shadow);
+  transition:transform .1s;
+}
+.tile:active{transform:scale(.97)}
+.tile .ic{width:48px;height:48px;border-radius:14px;background:var(--green-soft);display:grid;place-items:center;font-size:24px}
+.tile b{font-size:14px}
+.tile span{font-size:11.5px;color:var(--muted);line-height:1.4}
+
+/* List */
+.list{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.row{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border);width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;text-align:left}
+.row:last-child{border-bottom:0}
+.row .ic{width:40px;height:40px;border-radius:12px;background:var(--green-soft);display:grid;place-items:center;font-size:20px;flex:none}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:14.5px}
+.row .t span{font-size:12px;color:var(--muted)}
+.row .go{color:var(--muted);font-size:18px}
+
+/* Contact */
+.person{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;text-align:center;box-shadow:var(--shadow)}
+.avatar{width:76px;height:76px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,var(--green),#17a074);color:#fff;display:grid;place-items:center;font-size:32px;font-weight:700}
+.person h3{margin:0;font-size:18px}
+.person p{margin:4px 0;color:var(--muted);font-size:13.5px}
+.actions{display:flex;gap:10px;margin-top:16px}
+.actions .btn{flex:1}
+.note{font-size:12px;color:var(--muted);text-align:center;margin:12px 6px}
+
+/* Viewer (in-app browser) */
+#viewer{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column}
+#viewer.open{display:flex}
+#viewer .vbar{
+  background:var(--green);color:#fff;display:flex;align-items:center;gap:8px;
+  padding:calc(8px + env(safe-area-inset-top)) 10px 8px;
+}
+#viewer .vbar button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:13px}
+#viewer .vbar .vt{flex:1;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#viewer iframe{flex:1;border:0;width:100%;background:#fff}
+.loading{position:absolute;top:60px;left:0;right:0;text-align:center;color:var(--muted);font-size:13px;padding:10px;pointer-events:none}
+.loading.hide{display:none}
+.vhint{background:var(--green-soft);font-size:12px;padding:8px 12px;text-align:center;color:var(--muted)}
+
+/* Bottom nav */
+nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:linear-gradient(135deg,var(--green-dark),var(--green));
+  display:flex;padding:10px 4px calc(12px + env(safe-area-inset-bottom));
+}
+nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.4);padding:2px 0;line-height:1.4}
+nav button .i{width:50px;height:34px;border-radius:17px;background:#fff;display:grid;place-items:center;font-size:21px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.25);text-shadow:none}
+nav button.active{font-weight:800}
+nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
+
+.footer{text-align:center;color:var(--muted);font-size:11.5px;margin:26px 0 8px}
+.update{display:none;align-items:center;gap:8px;background:#fff3cd;color:#5c4400;padding:10px 14px;font-size:13px;line-height:1.4;border-bottom:1px solid #f0d98a}
+.update.show{display:flex}
+.update span{flex:1}
+.update button{border:0;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700}
+.update .go{background:var(--green);color:#fff}
+.update .x{background:transparent;color:#5c4400;padding:7px 8px}
+.offline{position:fixed;top:0;left:0;right:0;z-index:60;background:#b3261e;color:#fff;font-size:12px;text-align:center;padding:4px;display:none}
+
+/* Notification bell + panel */
+.topbar .bell{position:relative;background:rgba(255,255,255,.15);border:0;color:#fff;width:40px;height:40px;border-radius:50%;font-size:19px;flex:none;display:grid;place-items:center;padding:0}
+.bell .cnt{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#e53935;color:#fff;font-size:11px;font-weight:700;display:none;place-items:center;padding:0 4px;line-height:1}
+.bell .cnt.on{display:grid}
+#notifPanel{display:none;position:fixed;z-index:50;left:12px;right:12px;max-width:440px;margin-left:auto;top:calc(64px + env(safe-area-inset-top));background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.25);overflow:hidden}
+#notifPanel.open{display:block}
+#notifPanel .nh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)}
+#notifPanel .nh b{flex:1;font-size:15px}
+#notifPanel .nh button{background:none;border:0;color:var(--green);font-size:13px;font-weight:700;padding:4px 6px}
+#notifPanel .nl{max-height:55vh;overflow:auto}
+#notifPanel .ni{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:flex-start}
+#notifPanel .ni:last-child{border-bottom:0}
+#notifPanel .ni .nt{flex:1;min-width:0;font-size:13.5px;line-height:1.45}
+#notifPanel .ni .nt small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+#notifPanel .ni .na{margin-top:8px;background:var(--green);color:#fff;border:0;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:700}
+#notifPanel .ni .nx{background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
+#notifPanel .ne{padding:22px 14px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="offline" id="offline">ইন্টারনেট সংযোগ নেই — কিছু সেবা কাজ করবে না</div>
+
+<header class="topbar">
+  <button class="back" id="backBtn" aria-label="ফিরে যান">←</button>
+  <div class="logo"><img src="icon-192.png" alt="কলেজের লোগো"></div>
+  <h1 id="title">মাটিভাঙ্গা ডিগ্রি কলেজ</h1>
+  <button class="install" id="installBtn">⬇ ইনস্টল</button>
+  <button class="bell" id="bellBtn" aria-label="নোটিফিকেশন">🔔<span class="cnt" id="bellCnt"></span></button>
+</header>
+
+<div id="notifPanel">
+  <div class="nh"><b>🔔 নোটিফিকেশন</b><button id="nClear">সব মুছুন</button></div>
+  <div class="nl" id="nList"></div>
+</div>
+
+
+
+<main>
+  <!-- HOME -->
+  <section class="view active" id="home">
+    <div class="hero">
+      <h2>মাটিভাঙ্গা ডিগ্রি কলেজ</h2>
+      <p>মাটিভাঙ্গা, নাজিরপুর, পিরোজপুর</p>
+      <span class="badge">অভ্যন্তরীণ পরীক্ষার রেজাল্ট ও অন্যান্য</span>
+    </div>
+
+    <div class="highlight">
+      <div class="tag">সর্বশেষ প্রকাশিত রেজাল্ট</div>
+      <h3 id="latestTitle">বার্ষিক পরীক্ষা (Year Final) — ২০২৫-২৬</h3>
+      <p>অফিসিয়াল সাইটের সর্বশেষ প্রকাশিত রেজাল্ট।</p>
+      <button class="btn" data-open="result_latest">রেজাল্ট দেখুন</button>
+    </div>
+
+    <h3 class="sec">শিক্ষার্থী সেবা</h3>
+    <div class="grid">
+      <button class="tile" data-open="result_all" style="font:inherit;color:inherit"><div class="ic">📊</div><b>পূর্বের রেজাল্ট</b><span>সকল অভ্যন্তরীণ পরীক্ষা</span></button>
+      <button class="tile" data-open="routine" style="font:inherit;color:inherit"><div class="ic">🗓️</div><b>ক্লাস রুটিন</b><span>সাপ্তাহিক রুটিন দেখুন</span></button>
+      <button class="tile" data-open="tutorial" style="font:inherit;color:inherit"><div class="ic">📚</div><b>ক্লাস টিউটোরিয়াল</b><span>সকল বিষয়</span></button>
+      <button class="tile" data-open="admit" style="font:inherit;color:inherit"><div class="ic">🪪</div><b>অ্যাডমিট কার্ড</b><span>পরীক্ষার প্রবেশপত্র</span></button>
+      <button class="tile" data-open="attendance" style="font:inherit;color:inherit"><div class="ic">✅</div><b>ক্লাস হাজিরা</b><span>শিক্ষার্থী হাজিরা পোর্টাল</span></button>
+      <button class="tile" data-open="students" style="font:inherit;color:inherit"><div class="ic">👨‍🎓</div><b>শিক্ষার্থী তালিকা</b><span>তালিকা দেখুন</span></button>
+    </div>
+
+    <h3 class="sec">কলেজ পরিচিতি</h3>
+    <div class="grid">
+      <button class="tile" data-go="staff" style="font:inherit;color:inherit"><div class="ic">👩‍🏫</div><b>শিক্ষক ও কর্মচারী</b><span>তালিকা ও পোর্টাল</span></button>
+      <button class="tile" data-go="contact" style="font:inherit;color:inherit"><div class="ic">📞</div><b>যোগাযোগ</b><span>ফোন ও ইমেইল</span></button>
+    </div>
+    <div class="footer">© মাটিভাঙ্গা ডিগ্রি কলেজ · নাজিরপুর, পিরোজপুর</div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="view" id="results">
+    <div class="list">
+      <button class="row" data-open="result_latest"><div class="ic">🏆</div><div class="t"><b>বার্ষিক পরীক্ষা (Year Final) ২০২৫-২৬</b><span>সর্বশেষ প্রকাশিত রেজাল্ট</span></div><span class="go">›</span></button>
+      <button class="row" data-open="result_all"><div class="ic">📊</div><div class="t"><b>পূর্বের সকল পরীক্ষার রেজাল্ট</b><span>সকল সেশন ও পরীক্ষা</span></div><span class="go">›</span></button>
+      <button class="row" data-open="tutorial"><div class="ic">📝</div><div class="t"><b>ক্লাস টিউটোরিয়াল — সকল বিষয়</b><span>টিউটোরিয়াল ও অনুশীলন</span></div><span class="go">›</span></button>
+    </div>
+    <h3 class="sec">পরীক্ষা সংক্রান্ত</h3>
+    <div class="list">
+      <button class="row" data-open="admit"><div class="ic">🪪</div><div class="t"><b>অ্যাডমিট কার্ড</b><span>পরীক্ষার প্রবেশপত্র ডাউনলোড</span></div><span class="go">›</span></button>
+      <button class="row" data-open="qrscan"><div class="ic">📷</div><div class="t"><b>QR স্ক্যান — পরীক্ষায় উপস্থিতি</b><span>পরীক্ষার হলে হাজিরা</span></div><span class="go">›</span></button>
+    </div>
+  </section>
+
+  <!-- ROUTINE / CLASS -->
+  <section class="view" id="classes">
+    <div class="list">
+      <button class="row" data-open="routine"><div class="ic">🗓️</div><div class="t"><b>ক্লাস রুটিন</b><span>View – Class Routine</span></div><span class="go">›</span></button>
+      <button class="row" data-open="attendance"><div class="ic">✅</div><div class="t"><b>শিক্ষার্থীর ক্লাসে হাজিরা</b><span>হাজিরা পোর্টাল</span></div><span class="go">›</span></button>
+      <button class="row" data-open="tutorial"><div class="ic">📚</div><div class="t"><b>ক্লাস টিউটোরিয়াল</b><span>All Subjects</span></div><span class="go">›</span></button>
+      <button class="row" data-open="students"><div class="ic">👨‍🎓</div><div class="t"><b>শিক্ষার্থী তালিকা</b><span>নাম ও তথ্য</span></div><span class="go">›</span></button>
+    </div>
+  </section>
+
+  <!-- STAFF -->
+  <section class="view" id="staff">
+    <div class="list">
+      <button class="row" data-open="staff"><div class="ic">👩‍🏫</div><div class="t"><b>শিক্ষক ও কর্মচারী তালিকা</b><span>পোর্টালে প্রবেশ করুন</span></div><span class="go">›</span></button>
+      <button class="row" data-open="staffqr"><div class="ic">🔳</div><div class="t"><b>শিক্ষক ও কর্মচারীর QR</b><span>QR কোড দেখুন</span></div><span class="go">›</span></button>
+    </div>
+    <h3 class="sec">শিক্ষকদের জন্য টুলস</h3>
+    <div class="list">
+      <button class="row" data-open="voucher"><div class="ic">🧾</div><div class="t"><b>অটো ভাউচার জেনারেট</b><span>শিক্ষকদের জন্য</span></div><span class="go">›</span></button>
+      <button class="row" data-open="examroutine"><div class="ic">🛠️</div><div class="t"><b>Exam Routine Creator</b><span>পরীক্ষার রুটিন তৈরি</span></div><span class="go">›</span></button>
+      <button class="row" data-open="assessment"><div class="ic">📑</div><div class="t"><b>Subject Based Assessment Sheet</b><span>পরীক্ষার মূল্যায়ন শিট</span></div><span class="go">›</span></button>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="view" id="contact">
+    <div class="person">
+      <div class="avatar">অ</div>
+      <p style="margin:0;font-size:12px">প্রয়োজনে যোগাযোগ করুন</p>
+      <h3>মোঃ আসাদুজ্জামান</h3>
+      <p>প্রভাষক, গণিত</p>
+      <p>মাটিভাঙ্গা ডিগ্রি কলেজ, নাজিরপুর, পিরোজপুর</p>
+      <p>📱 01718832260<br>✉️ asad814008@gmail.com</p>
+      <div class="actions">
+        <a class="btn" href="tel:01718832260">📞 কল করুন</a>
+        <a class="btn ghost" href="mailto:asad814008@gmail.com">✉️ ইমেইল</a>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="sms:01718832260">💬 SMS</a>
+        <a class="btn ghost" href="https://wa.me/8801718832260" target="_blank" rel="noopener">🟢 WhatsApp</a>
+      </div>
+    </div>
+    <h3 class="sec">কলেজের ঠিকানা</h3>
+    <div class="list">
+      <a class="row" href="https://www.google.com/maps/dir/Matibhanga+Degree+College,+Mativangga+Union,+Bangladesh/Matibhanga+Degree+College,+Mativangga+Union,+Bangladesh/@22.8224542,89.9346647,12z/data=!4m13!4m12!1m5!1m1!1s0x39ffe3d040004e4d:0x7ad1122b8955a22!2m2!1d89.9441442!2d22.8153279!1m5!1m1!1s0x39ffe3d040004e4d:0x7ad1122b8955a22!2m2!1d89.9441442!2d22.8153279?entry=ttu&g_ep=EgoyMDI2MTExOC4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
+        <div class="ic">📍</div><div class="t"><b>মাটিভাঙ্গা ডিগ্রি কলেজ</b><span>মাটিভাঙ্গা, নাজিরপুর, পিরোজপুর — ম্যাপে দেখুন</span></div><span class="go">›</span>
+      </a>
+      <a class="row" href="https://sites.google.com/view/matibhangadegreecollege/" target="_blank" rel="noopener">
+        <div class="ic">🌐</div><div class="t"><b>অফিশিয়াল ওয়েবসাইট</b><span>sites.google.com/view/matibhangadegreecollege</span></div><span class="go">›</span>
+      </a>
+      <button class="row" data-share="1" type="button">
+        <div class="ic">📤</div><div class="t"><b>অ্যাপ শেয়ার করুন</b><span>বন্ধু ও সহপাঠীদের ডাউনলোড লিংক পাঠান</span></div><span class="go">›</span>
+      </button>
+    </div>
+    <div class="note" id="syncStatus"></div>
+  </section>
+</main>
+
+<!-- In-app viewer -->
+<div id="viewer">
+  <div class="vbar">
+    <button id="vClose">✕ বন্ধ</button>
+    <div class="vt" id="vTitle"></div>
+    <button id="vExt">↗ ব্রাউজার</button>
+  </div>
+  <div class="vhint" id="vHint">লোড হতে একটু সময় লাগতে পারে। না খুললে উপরের "↗ ব্রাউজার" চাপুন।</div>
+  <div class="loading" id="vLoading">⏳ লোড হচ্ছে…</div>
+  <iframe id="vFrame" title="content" allow="camera; clipboard-write; fullscreen" referrerpolicy="no-referrer"></iframe>
+</div>
+
+<nav>
+  <button class="active" data-tab="home"><span class="i">🏠</span>হোম</button>
+  <button data-tab="results"><span class="i">📊</span>রেজাল্ট</button>
+  <button data-tab="classes"><span class="i">📚</span>ক্লাস</button>
+  <button data-tab="staff"><span class="i">👩‍🏫</span>শিক্ষক</button>
+  <button data-tab="contact"><span class="i">📞</span>যোগাযোগ</button>
+</nav>
+
+<script>
+(function(){
+  // ====== সকল লিংক এক জায়গায় — পরিবর্তন করতে শুধু এখানে এডিট করুন ======
+  var GAS = "https://script.google.com/macros/s/";
+  var LINKS = {
+    result_latest:{t:"বার্ষিক পরীক্ষা ২০২৫-২৬", u:GAS+"AKfycbyJC6ICu5lfK0YRoA0HZ2jrWrbbm_FRsuDP1xMikfFGOubDW1f3SqvGhcomwxP9UsYp/exec?session=2025-26&exam=2025-26_Year_Final"},
+    result_all:   {t:"পূর্বের সকল রেজাল্ট", u:GAS+"AKfycbwTu4J7RPBm-rutE0KAbBypFAfQRyssx_xyAxO-PGflRVo1iiUV7KQ6bGrLPRF4S13x/exec"},
+    routine:      {t:"ক্লাস রুটিন", u:GAS+"AKfycbxFsVaStpICLRaNOmkUH9LhBhT5cTi5BZeISY3MTn6Qqnd72ZSgxhDqdxg-8EFzAyPH/exec"},
+    tutorial:     {t:"ক্লাস টিউটোরিয়াল", u:GAS+"AKfycbzojt7eWzYlzZcrQml7cNzhSdb7hQEhrcRKv7TDwN7x71kQIOOJqIneudQXfDMMpBiA/exec"},
+    attendance:   {t:"ক্লাস হাজিরা", u:GAS+"AKfycby0CBt7ec_QkX-hN7lddBbszV2rhrc--U9LrblcOfzRU1S9I-Vhuca2O0_kY8csp9VNvw/exec?page=class"},
+    admit:        {t:"অ্যাডমিট কার্ড", u:GAS+"AKfycby0CBt7ec_QkX-hN7lddBbszV2rhrc--U9LrblcOfzRU1S9I-Vhuca2O0_kY8csp9VNvw/exec?page=exam"},
+    students:     {t:"শিক্ষার্থী তালিকা", u:GAS+"AKfycby0CBt7ec_QkX-hN7lddBbszV2rhrc--U9LrblcOfzRU1S9I-Vhuca2O0_kY8csp9VNvw/exec?page=students"},
+    qrscan:       {t:"QR স্ক্যান — পরীক্ষায় উপস্থিতি", u:"https://md-lingkon.github.io/attendance-scanner/", ext:true},
+    staff:        {t:"শিক্ষক ও কর্মচারী তালিকা", u:GAS+"AKfycbwoqO8aOQs7FVxZZP-BkQa53uaPMCKV9UWMJndnh9VFOPid4GN-A8L0wa2Tudcs7PkU6g/exec"},
+    staffqr:      {t:"শিক্ষক ও কর্মচারীর QR", u:GAS+"AKfycbxHYDX4W0IyD5WXOqXSu5Gb9YwUCOnsshgETW4cbfca0n7X7Ll8ho3cDN4ylIeq4erf/exec"},
+    voucher:      {t:"অটো ভাউচার জেনারেট", u:GAS+"AKfycbwLT48GGCKy6bFoHeJRvwjrsKSu3wjFP8KeG_WiNeZdIg5ANyJN3a4vfUADgQ7IgMer/exec"},
+    examroutine:  {t:"Exam Routine Creator", u:GAS+"AKfycbzjGkFtmTD9NJrClQVGj4Hm4ngJzjjxnsQu6OWbfL4v5zKj96P69dDhyZeTCOTbr9He/exec"},
+    assessment:   {t:"Subject Based Assessment Sheet", u:GAS+"AKfycbxqNHsEsgWS9dIJdPQxZz3-n_h7EHg6jxM58gJqY74CI_MXwJ9TJL2IdX4bBMuKwI4/exec"}
+  };
+  var TITLES = {home:"মাটিভাঙ্গা ডিগ্রি কলেজ", results:"পরীক্ষার রেজাল্ট", classes:"ক্লাস ও শিক্ষার্থী", staff:"শিক্ষক ও কর্মচারী", contact:"যোগাযোগ"};
+
+  var $ = function(s){return document.querySelector(s)};
+  var $$ = function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+  var current = "home";
+
+  function show(tab){
+    current = tab;
+    $$(".view").forEach(function(v){v.classList.toggle("active", v.id===tab)});
+    $$("nav button").forEach(function(b){b.classList.toggle("active", b.dataset.tab===tab)});
+    $("#title").textContent = TITLES[tab] || TITLES.home;
+    $("#backBtn").style.display = tab==="home" ? "none" : "block";
+    $(".topbar .logo").style.display = tab==="home" ? "grid" : "none";
+    window.scrollTo(0,0);
+  }
+
+  // Viewer
+  var frame = $("#vFrame"), loadTimer = null, curUrl = "";
+  // Google Script পেজ ফ্রেমে খোলে না, তাই সবকিছু আলাদা ট্যাব/ইন-অ্যাপ ব্রাউজারে খোলা হয়
+  var USE_IFRAME = false;
+  function isNative(){
+    try{ var C = window.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){ return false; }
+  }
+  function openExternal(url){
+    // অ্যাপের ভিতরেই খুলবে (একই WebView-তে)। ফিরতে ভাসমান "← অ্যাপে ফিরুন" বোতাম বা ফোনের ব্যাক বাটন।
+    if(isNative()){
+      try{ sessionStorage.setItem("mbTab", current); }catch(e){}
+      location.href = url;
+      return;
+    }
+    var w = window.open(url, "_blank");
+    if(!w) location.href = url;
+  }
+  function openLink(key){
+    var l = LINKS[key]; if(!l) return;
+    if(l.ext || !USE_IFRAME){ openExternal(l.u); return; }
+    curUrl = l.u;
+    $("#vTitle").textContent = l.t;
+    $("#vLoading").classList.remove("hide");
+    $("#vHint").style.display = "block";
+    frame.src = l.u;
+    $("#viewer").classList.add("open");
+    history.pushState({v:1}, "");
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(function(){ $("#vLoading").textContent = "⏳ এখনও লোড হচ্ছে… না খুললে \"↗ ব্রাউজার\" চাপুন"; }, 8000);
+  }
+  function closeViewer(fromPop){
+    $("#viewer").classList.remove("open");
+    frame.src = "about:blank";
+    clearTimeout(loadTimer);
+    $("#vLoading").textContent = "⏳ লোড হচ্ছে…";
+    if(!fromPop && history.state && history.state.v) history.back();
+  }
+  frame.addEventListener("load", function(){
+    if(frame.src && frame.src !== "about:blank"){
+      $("#vLoading").classList.add("hide");
+      clearTimeout(loadTimer);
+    }
+  });
+  $("#vClose").onclick = function(){ closeViewer(false) };
+  $("#vExt").onclick = function(){ openExternal(curUrl) };
+  window.addEventListener("popstate", function(){
+    if($("#viewer").classList.contains("open")) closeViewer(true);
+  });
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("[data-open],[data-go],[data-tab],[data-share]");
+    if(!el) return;
+    if(el.dataset.share) shareApp();
+    else if(el.dataset.open) openLink(el.dataset.open);
+    else if(el.dataset.go) show(el.dataset.go);
+    else if(el.dataset.tab) show(el.dataset.tab);
+  });
+  $("#backBtn").onclick = function(){ show("home") };
+  // লিংক থেকে ফিরে এলে আগের ট্যাবেই থাকবে
+  try{
+    var savedTab = sessionStorage.getItem("mbTab");
+    if(savedTab && TITLES[savedTab]) show(savedTab);
+    sessionStorage.removeItem("mbTab");
+  }catch(e){}
+  // বাইরের পেজের নিচের বার থেকে এলে (#results, #classes ...) সেই ট্যাব খোলা
+  try{
+    var hTab = (location.hash||"").replace("#","");
+    if(hTab && TITLES[hTab]) show(hTab);
+  }catch(e){}
+
+  // ====== লিংক অটো-সিঙ্ক (অফিসিয়াল সাইট থেকে) ======
+  // অ্যাপ খুললে অফিসিয়াল সাইটের পেজ পড়ে লিংক নিজে বদলে নেয়। ব্যর্থ হলে উপরের LINKS-ই চলবে।
+  var SITE = "https://sites.google.com/view/matibhangadegreecollege/";
+  var PAGES = ["home","class-routine","class-tutorial","class-attendance","admit-card-panel","teachers-and-staff","essential-link"];
+  // [অ্যাপের কী, সাইটের পেজ, লিংকের লেখা মেলানোর শর্ত (না থাকলে পেজের প্রথম বাইরের লিংক)]
+  var RULES = [
+    ["result_latest","home",function(t){return !/পূর্বের/.test(t)}],
+    ["result_all","home",function(t){return /পূর্বের/.test(t)}],
+    ["routine","class-routine",null],
+    ["tutorial","class-tutorial",null],
+    ["attendance","class-attendance",null],
+    ["admit","admit-card-panel",function(t){return /admit/i.test(t)}],
+    ["qrscan","admit-card-panel",function(t){return /qr|scan/i.test(t)}],
+    ["staff","teachers-and-staff",null],
+    ["students","essential-link",function(t){return /শিক্ষার্থী তালিকা/.test(t)}],
+    ["staffqr","essential-link",function(t){return /QR/i.test(t) && /শিক্ষক|কর্মচারী/.test(t)}],
+    ["voucher","essential-link",function(t){return /ভাউচার/.test(t)}],
+    ["examroutine","essential-link",function(t){return /Exam Routine/i.test(t)}],
+    ["assessment","essential-link",function(t){return /Assessment/i.test(t)}]
+  ];
+  function unwrapUrl(h){
+    try{
+      var u = new URL(h, SITE);
+      if(/(^|\.)google\.com$/.test(u.hostname) && u.pathname === "/url"){
+        var q = u.searchParams.get("q"); if(q) return q;
+      }
+      return u.href;
+    }catch(e){ return ""; }
+  }
+  function parsePage(html){
+    var doc = new DOMParser().parseFromString(html, "text/html");
+    var out = [];
+    Array.prototype.forEach.call(doc.querySelectorAll("a[href]"), function(a){
+      var h = unwrapUrl(a.getAttribute("href"));
+      if(!/^https?:\/\//.test(h) || /^https?:\/\/sites\.google\.com\//.test(h)) return;
+      out.push({ t:(a.textContent||"").replace(/\s+/g," ").trim(), u:h });
+    });
+    if(!out.length){
+      // পেজে <a> না থাকলে (লিংক স্ক্রিপ্টের ডেটায় থাকলে) সরাসরি Script লিংক খুঁজে নেয়
+      var raw = html.replace(/\\u003d/g,"=").replace(/\\u0026/g,"&").replace(/\\\//g,"/").replace(/&amp;/g,"&");
+      var m = raw.match(/https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_\-]+\/exec[^"'\\\s<>)]*/g) || [];
+      var seen = {};
+      m.forEach(function(u){ if(!seen[u]){ seen[u]=1; out.push({t:"", u:u}); } });
+    }
+    return out;
+  }
+  function paintLatest(label){
+    if(!label) return;
+    label = label.replace(/^[\s\-–—]+|[\s\-–—]+$/g, "");
+    var el = $("#latestTitle"); if(el && label) el.textContent = label;
+    if(LINKS.result_latest) LINKS.result_latest.t = label;
+  }
+  function applyLinks(map){
+    for(var k in map){
+      if(k === "_latest"){ paintLatest(map[k]); continue; }
+      if(LINKS[k] && /^https?:\/\//.test(map[k])) LINKS[k].u = map[k];
+    }
+  }
+  function setSync(msg){
+    var el = $("#syncStatus"); if(!el) return;
+    var d = new Date();
+    el.textContent = "লিংক সিঙ্ক: " + msg + " · " + d.toLocaleDateString("bn-BD") + " " + d.toLocaleTimeString("bn-BD");
+  }
+  function syncLinks(){
+    try{ var c = localStorage.getItem("linkCache"); if(c) applyLinks(JSON.parse(c)); }catch(e){}
+    try{
+      var C = window.Capacitor;
+      var native = C && C.isNativePlatform && C.isNativePlatform();
+      if(!native){ setSync("শুধু APK অ্যাপে চলে"); return; }
+      if(!navigator.onLine){ setSync("ইন্টারনেট নেই (আগের লিংক ব্যবহার হচ্ছে)"); return; }
+      if(!window.fetch || !window.DOMParser){ setSync("এই ফোনে সমর্থিত নয়"); return; }
+      var errs = [];
+      Promise.all(PAGES.map(function(p){
+        return fetch(SITE + p, {cache:"no-store"})
+          .then(function(r){ if(!r.ok){ errs.push(p + " HTTP " + r.status); return [p, null]; } return r.text(); })
+          .then(function(h){ if(Array.isArray(h)) return h; return [p, parsePage(h)]; })
+          .catch(function(e){ errs.push(p + " " + String((e && e.message) || e).slice(0,40)); return [p, null]; });
+      })).then(function(res){
+        var pages = {}, info = [];
+        res.forEach(function(x){ pages[x[0]] = x[1]; info.push(x[0] + ":" + (x[1] ? x[1].length : "✗")); });
+        var map = {};
+        RULES.forEach(function(r){
+          var links = pages[r[1]]; if(!links) return;
+          for(var i=0;i<links.length;i++){
+            if(!r[2] || r[2](links[i].t)){
+              map[r[0]] = links[i].u;
+              if(r[0] === "result_latest" && links[i].t) map._latest = links[i].t;
+              break;
+            }
+          }
+        });
+        var found = Object.keys(map).filter(function(k){ return k !== "_latest"; }).length;
+        if(found){
+          applyLinks(map);
+          try{ localStorage.setItem("linkCache", JSON.stringify(map)); }catch(e){}
+        }
+        setSync(found + "/" + RULES.length + " লিংক পাওয়া গেছে [" + info.join(", ") + "]" + (errs.length ? " ত্রুটি: " + errs.slice(0,2).join("; ") : ""));
+      }).catch(function(e){ setSync("ব্যর্থ — " + String((e && e.message) || e).slice(0,60)); });
+    }catch(e){ setSync("ব্যর্থ — " + String((e && e.message) || e).slice(0,60)); }
+  }
+  syncLinks();
+
+  // ====== আপডেট নোটিশ ======
+  // APP_BUILD: GitHub build-এর সময় নিজে নিজে বসে যায় (হাতে বদলাবেন না)
+  var APP_BUILD = 0;
+  var REPO = "md-lingkon/matibhanga-app";
+  var APK_URL = "https://github.com/" + REPO + "/releases/latest/download/matibhanga-college.apk";
+  function shareApp(){
+    var title = "মাটিভাঙ্গা ডিগ্রি কলেজ অ্যাপ";
+    var text = title + " — ডাউনলোড করুন:\n" + APK_URL;
+    try{
+      if(window.MBAndroid && window.MBAndroid.shareText){ window.MBAndroid.shareText(title, text); return; }
+    }catch(e){}
+    try{
+      if(navigator.share){ navigator.share({title:title, text:text}); return; }
+    }catch(e){}
+    try{
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ alert("ডাউনলোড লিংক কপি হয়েছে"); }); return; }
+    }catch(e){}
+    prompt("এই লিংক কপি করে শেয়ার করুন", APK_URL);
+  }
+  function checkUpdate(){
+    try{
+      var C = window.Capacitor;
+      var native = C && C.isNativePlatform && C.isNativePlatform();
+      if(!native || !APP_BUILD || !navigator.onLine || !window.fetch) return;
+      fetch("https://api.github.com/repos/" + REPO + "/releases/latest", {headers:{Accept:"application/vnd.github+json"}, cache:"no-store"})
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){
+          if(!d || !d.tag_name) return;
+          var latest = parseInt(String(d.tag_name).replace(/\D/g,""), 10);
+          if(!(latest > APP_BUILD)){ dropUpdateNotifs(APP_BUILD); return; }
+          addNotif({id:"update-"+latest, text:"অ্যাপের নতুন সংস্করণ (১."+latest+") এসেছে। আপডেট করে নিন।", action:"update", label:"ডাউনলোড"});
+        })
+        .catch(function(){});
+    }catch(e){}
+  }
+
+  // ====== নোটিফিকেশন (কেটে না দেওয়া পর্যন্ত থাকে) ======
+  var NKEY = "mbNotifs", CKEY = "mbNotifCleared";
+  function readJ(k){ try{ return JSON.parse(localStorage.getItem(k) || "[]"); }catch(e){ return []; } }
+  function writeJ(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function markCleared(id){ var c = readJ(CKEY); if(c.indexOf(id) < 0){ c.push(id); writeJ(CKEY, c.slice(-50)); } }
+  function addNotif(n){
+    if(readJ(CKEY).indexOf(n.id) >= 0) return;
+    var a = readJ(NKEY);
+    for(var i=0;i<a.length;i++) if(a[i].id === n.id) return;
+    n.time = Date.now();
+    a.unshift(n); writeJ(NKEY, a); renderN();
+  }
+  function dropUpdateNotifs(build){
+    // অ্যাপ আপডেট হয়ে গেলে পুরনো আপডেট-নোটিফিকেশন নিজে সরে যাবে
+    var a = readJ(NKEY).filter(function(x){
+      var m = /^update-(\d+)$/.exec(x.id);
+      return !(m && parseInt(m[1],10) <= build);
+    });
+    writeJ(NKEY, a); renderN();
+  }
+  function removeNotif(id){ markCleared(id); writeJ(NKEY, readJ(NKEY).filter(function(x){ return x.id !== id; })); renderN(); }
+  function fmtTime(t){
+    try{ return new Date(t).toLocaleString("bn-BD", {day:"numeric", month:"short", hour:"numeric", minute:"2-digit"}); }catch(e){ return ""; }
+  }
+  function renderN(){
+    var list = $("#nList"), a = readJ(NKEY);
+    while(list.firstChild) list.removeChild(list.firstChild);
+    var cnt = $("#bellCnt");
+    cnt.textContent = a.length > 9 ? "৯+" : String(a.length).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯".charAt(+d); });
+    cnt.classList.toggle("on", a.length > 0);
+    if(!a.length){
+      var e = document.createElement("div"); e.className = "ne"; e.textContent = "কোনো নোটিফিকেশন নেই"; list.appendChild(e); return;
+    }
+    a.forEach(function(n){
+      var row = document.createElement("div"); row.className = "ni";
+      var t = document.createElement("div"); t.className = "nt";
+      t.appendChild(document.createTextNode(n.text));
+      var sm = document.createElement("small"); sm.textContent = fmtTime(n.time); t.appendChild(sm);
+      if(n.action === "update"){
+        var b = document.createElement("button"); b.className = "na"; b.textContent = n.label || "ডাউনলোড";
+        b.onclick = function(){ openExternal(APK_URL); };
+        t.appendChild(b);
+      }
+      var x = document.createElement("button"); x.className = "nx"; x.textContent = "✕"; x.setAttribute("aria-label","মুছুন");
+      x.onclick = function(){ removeNotif(n.id); };
+      row.appendChild(t); row.appendChild(x); list.appendChild(row);
+    });
+  }
+  $("#bellBtn").onclick = function(e){ e.stopPropagation(); $("#notifPanel").classList.toggle("open"); };
+  $("#nClear").onclick = function(){
+    readJ(NKEY).forEach(function(n){ markCleared(n.id); });
+    writeJ(NKEY, []); renderN();
+  };
+  document.addEventListener("click", function(e){
+    if($("#notifPanel").classList.contains("open") && !e.target.closest("#notifPanel")) $("#notifPanel").classList.remove("open");
+  });
+  renderN();
+  if(typeof APP_BUILD !== "undefined" && APP_BUILD) dropUpdateNotifs(APP_BUILD);
+  setTimeout(checkUpdate, 1500);
+
+  // Offline banner
+  function net(){ $("#offline").style.display = navigator.onLine ? "none" : "block"; }
+  window.addEventListener("online", net); window.addEventListener("offline", net); net();
+
+  // Install prompt
+  var deferred = null;
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferred = e; $("#installBtn").style.display = "inline-block";
+  });
+  $("#installBtn").onclick = function(){
+    if(!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.finally(function(){ deferred=null; $("#installBtn").style.display="none"; });
+  };
+  window.addEventListener("appinstalled", function(){ $("#installBtn").style.display="none"; });
+
+  // Service worker
+  if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+    window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+  }
+})();
+</script>
+</body>
+</html>
