@@ -141,6 +141,24 @@ nav button.active .i{filter:none;opacity:1}
 .update .go{background:var(--green);color:#fff}
 .update .x{background:transparent;color:#5c4400;padding:7px 8px}
 .offline{position:fixed;top:0;left:0;right:0;z-index:60;background:#b3261e;color:#fff;font-size:12px;text-align:center;padding:4px;display:none}
+
+/* Notification bell + panel */
+.topbar .bell{position:relative;background:rgba(255,255,255,.15);border:0;color:#fff;width:40px;height:40px;border-radius:50%;font-size:19px;flex:none;display:grid;place-items:center;padding:0}
+.bell .cnt{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#e53935;color:#fff;font-size:11px;font-weight:700;display:none;place-items:center;padding:0 4px;line-height:1}
+.bell .cnt.on{display:grid}
+#notifPanel{display:none;position:fixed;z-index:50;left:12px;right:12px;max-width:440px;margin-left:auto;top:calc(64px + env(safe-area-inset-top));background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.25);overflow:hidden}
+#notifPanel.open{display:block}
+#notifPanel .nh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)}
+#notifPanel .nh b{flex:1;font-size:15px}
+#notifPanel .nh button{background:none;border:0;color:var(--green);font-size:13px;font-weight:700;padding:4px 6px}
+#notifPanel .nl{max-height:55vh;overflow:auto}
+#notifPanel .ni{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:flex-start}
+#notifPanel .ni:last-child{border-bottom:0}
+#notifPanel .ni .nt{flex:1;min-width:0;font-size:13.5px;line-height:1.45}
+#notifPanel .ni .nt small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+#notifPanel .ni .na{margin-top:8px;background:var(--green);color:#fff;border:0;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:700}
+#notifPanel .ni .nx{background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
+#notifPanel .ne{padding:22px 14px;text-align:center;color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
@@ -151,13 +169,15 @@ nav button.active .i{filter:none;opacity:1}
   <div class="logo"><img src="icon-192.png" alt="কলেজের লোগো"></div>
   <h1 id="title">মাটিভাঙ্গা ডিগ্রি কলেজ</h1>
   <button class="install" id="installBtn">⬇ ইনস্টল</button>
+  <button class="bell" id="bellBtn" aria-label="নোটিফিকেশন">🔔<span class="cnt" id="bellCnt"></span></button>
 </header>
 
-<div class="update" id="updateBar">
-  <span>🔔 অ্যাপের নতুন সংস্করণ এসেছে। আপডেট করে নিন।</span>
-  <button class="go" id="updateGo">ডাউনলোড</button>
-  <button class="x" id="updateX" aria-label="বন্ধ">✕</button>
+<div id="notifPanel">
+  <div class="nh"><b>🔔 নোটিফিকেশন</b><button id="nClear">সব মুছুন</button></div>
+  <div class="nl" id="nList"></div>
 </div>
+
+
 
 <main>
   <!-- HOME -->
@@ -258,6 +278,9 @@ nav button.active .i{filter:none;opacity:1}
       <a class="row" href="https://sites.google.com/view/matibhangadegreecollege/" target="_blank" rel="noopener">
         <div class="ic">🌐</div><div class="t"><b>অফিশিয়াল ওয়েবসাইট</b><span>sites.google.com/view/matibhangadegreecollege</span></div><span class="go">›</span>
       </a>
+      <button class="row" data-share="1" type="button">
+        <div class="ic">📤</div><div class="t"><b>অ্যাপ শেয়ার করুন</b><span>বন্ধু ও সহপাঠীদের ডাউনলোড লিংক পাঠান</span></div><span class="go">›</span>
+      </button>
     </div>
     <div class="note" id="syncStatus"></div>
   </section>
@@ -368,9 +391,10 @@ nav button.active .i{filter:none;opacity:1}
   });
 
   document.addEventListener("click", function(e){
-    var el = e.target.closest("[data-open],[data-go],[data-tab]");
+    var el = e.target.closest("[data-open],[data-go],[data-tab],[data-share]");
     if(!el) return;
-    if(el.dataset.open) openLink(el.dataset.open);
+    if(el.dataset.share) shareApp();
+    else if(el.dataset.open) openLink(el.dataset.open);
     else if(el.dataset.go) show(el.dataset.go);
     else if(el.dataset.tab) show(el.dataset.tab);
   });
@@ -494,6 +518,20 @@ nav button.active .i{filter:none;opacity:1}
   var APP_BUILD = 0;
   var REPO = "md-lingkon/matibhanga-app";
   var APK_URL = "https://github.com/" + REPO + "/releases/latest/download/matibhanga-college.apk";
+  function shareApp(){
+    var title = "মাটিভাঙ্গা ডিগ্রি কলেজ অ্যাপ";
+    var text = title + " — ডাউনলোড করুন:\n" + APK_URL;
+    try{
+      if(window.MBAndroid && window.MBAndroid.shareText){ window.MBAndroid.shareText(title, text); return; }
+    }catch(e){}
+    try{
+      if(navigator.share){ navigator.share({title:title, text:text}); return; }
+    }catch(e){}
+    try{
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ alert("ডাউনলোড লিংক কপি হয়েছে"); }); return; }
+    }catch(e){}
+    prompt("এই লিংক কপি করে শেয়ার করুন", APK_URL);
+  }
   function checkUpdate(){
     try{
       var C = window.Capacitor;
@@ -504,20 +542,71 @@ nav button.active .i{filter:none;opacity:1}
         .then(function(d){
           if(!d || !d.tag_name) return;
           var latest = parseInt(String(d.tag_name).replace(/\D/g,""), 10);
-          if(!(latest > APP_BUILD)) return;
-          var seen = 0;
-          try{ seen = parseInt(localStorage.getItem("dismissedBuild") || "0", 10); }catch(e){}
-          if(seen >= latest) return;
-          $("#updateBar").classList.add("show");
-          $("#updateX").onclick = function(){
-            $("#updateBar").classList.remove("show");
-            try{ localStorage.setItem("dismissedBuild", String(latest)); }catch(e){}
-          };
-          $("#updateGo").onclick = function(){ openExternal(APK_URL); };
+          if(!(latest > APP_BUILD)){ dropUpdateNotifs(APP_BUILD); return; }
+          addNotif({id:"update-"+latest, text:"অ্যাপের নতুন সংস্করণ (১."+latest+") এসেছে। আপডেট করে নিন।", action:"update", label:"ডাউনলোড"});
         })
         .catch(function(){});
     }catch(e){}
   }
+
+  // ====== নোটিফিকেশন (কেটে না দেওয়া পর্যন্ত থাকে) ======
+  var NKEY = "mbNotifs", CKEY = "mbNotifCleared";
+  function readJ(k){ try{ return JSON.parse(localStorage.getItem(k) || "[]"); }catch(e){ return []; } }
+  function writeJ(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function markCleared(id){ var c = readJ(CKEY); if(c.indexOf(id) < 0){ c.push(id); writeJ(CKEY, c.slice(-50)); } }
+  function addNotif(n){
+    if(readJ(CKEY).indexOf(n.id) >= 0) return;
+    var a = readJ(NKEY);
+    for(var i=0;i<a.length;i++) if(a[i].id === n.id) return;
+    n.time = Date.now();
+    a.unshift(n); writeJ(NKEY, a); renderN();
+  }
+  function dropUpdateNotifs(build){
+    // অ্যাপ আপডেট হয়ে গেলে পুরনো আপডেট-নোটিফিকেশন নিজে সরে যাবে
+    var a = readJ(NKEY).filter(function(x){
+      var m = /^update-(\d+)$/.exec(x.id);
+      return !(m && parseInt(m[1],10) <= build);
+    });
+    writeJ(NKEY, a); renderN();
+  }
+  function removeNotif(id){ markCleared(id); writeJ(NKEY, readJ(NKEY).filter(function(x){ return x.id !== id; })); renderN(); }
+  function fmtTime(t){
+    try{ return new Date(t).toLocaleString("bn-BD", {day:"numeric", month:"short", hour:"numeric", minute:"2-digit"}); }catch(e){ return ""; }
+  }
+  function renderN(){
+    var list = $("#nList"), a = readJ(NKEY);
+    while(list.firstChild) list.removeChild(list.firstChild);
+    var cnt = $("#bellCnt");
+    cnt.textContent = a.length > 9 ? "৯+" : String(a.length).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯".charAt(+d); });
+    cnt.classList.toggle("on", a.length > 0);
+    if(!a.length){
+      var e = document.createElement("div"); e.className = "ne"; e.textContent = "কোনো নোটিফিকেশন নেই"; list.appendChild(e); return;
+    }
+    a.forEach(function(n){
+      var row = document.createElement("div"); row.className = "ni";
+      var t = document.createElement("div"); t.className = "nt";
+      t.appendChild(document.createTextNode(n.text));
+      var sm = document.createElement("small"); sm.textContent = fmtTime(n.time); t.appendChild(sm);
+      if(n.action === "update"){
+        var b = document.createElement("button"); b.className = "na"; b.textContent = n.label || "ডাউনলোড";
+        b.onclick = function(){ openExternal(APK_URL); };
+        t.appendChild(b);
+      }
+      var x = document.createElement("button"); x.className = "nx"; x.textContent = "✕"; x.setAttribute("aria-label","মুছুন");
+      x.onclick = function(){ removeNotif(n.id); };
+      row.appendChild(t); row.appendChild(x); list.appendChild(row);
+    });
+  }
+  $("#bellBtn").onclick = function(e){ e.stopPropagation(); $("#notifPanel").classList.toggle("open"); };
+  $("#nClear").onclick = function(){
+    readJ(NKEY).forEach(function(n){ markCleared(n.id); });
+    writeJ(NKEY, []); renderN();
+  };
+  document.addEventListener("click", function(e){
+    if($("#notifPanel").classList.contains("open") && !e.target.closest("#notifPanel")) $("#notifPanel").classList.remove("open");
+  });
+  renderN();
+  if(typeof APP_BUILD !== "undefined" && APP_BUILD) dropUpdateNotifs(APP_BUILD);
   setTimeout(checkUpdate, 1500);
 
   // Offline banner
