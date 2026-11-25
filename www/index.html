@@ -230,7 +230,7 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
   <!-- RESULTS -->
   <section class="view" id="results">
     <div class="list">
-      <button class="row" data-open="result_latest"><div class="ic">🏆</div><div class="t"><b id="latestRowTitle">বার্ষিক পরীক্ষা (Year Final) ২০২৫-২৬</b><span>সর্বশেষ পরীক্ষা</span></div><span class="go">›</span></button>
+      <button class="row" data-open="result_latest"><div class="ic">🏆</div><div class="t"><b id="latestRowTitle">বার্ষিক পরীক্ষা (Year Final) ২০২৫-২৬</b><span>সর্বশেষ পরীক্ষার তথ্য</span></div><span class="go">›</span></button>
       <button class="row" data-open="result_all"><div class="ic">📊</div><div class="t"><b>পূর্বের সকল পরীক্ষার রেজাল্ট</b><span>সকল সেশন ও পরীক্ষা</span></div><span class="go">›</span></button>
       <button class="row" data-open="offline"><div class="ic">📴</div><div class="t"><b>অফলাইন রেজাল্ট</b><span>ইন্টারনেট ছাড়াও দেখা যাবে</span></div><span class="go">›</span></button>
       <button class="row" data-open="tutorial"><div class="ic">📝</div><div class="t"><b>ক্লাস টিউটোরিয়াল — সকল বিষয়</b><span>টিউটোরিয়াল ও অনুশীলন</span></div><span class="go">›</span></button>
@@ -273,7 +273,7 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
       <p style="margin:0;font-size:12px">প্রয়োজনে যোগাযোগ করুন</p>
       <h3>মোঃ আসাদুজ্জামান</h3>
       <p>প্রভাষক, গণিত</p>
-      <p>মাটিভাঙ্গা ডিগ্রি কলেজ, নাজিরপুর, পিরোজপুর</p>
+      <p>মাটিভাঙ্গা ডিগ্রি কলেজ, নাজিরপুর, পিরোজপুর।</p>
       <p>📱 01718832260<br>✉️ asad814008@gmail.com</p>
       <div class="actions">
         <a class="btn" href="tel:01718832260">📞 কল করুন</a>
@@ -365,18 +365,18 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
   function isNative(){
     try{ var C = window.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){ return false; }
   }
-  function openExternal(url){
+  function openExternal(url, noWait){
     // অ্যাপের ভিতরেই খুলবে (একই WebView-তে)। ফিরতে ভাসমান "← অ্যাপে ফিরুন" বোতাম বা ফোনের ব্যাক বাটন।
     var ov = $("#waitOv");
     if(isNative()){
       try{ sessionStorage.setItem("mbTab", current); }catch(e){}
       // নতুন পেজ ফুটে না ওঠা পর্যন্ত এই পর্দা থাকবে (পুরোনো পেজ ততক্ষণ পর্দায় থাকে)
-      if(!/^https?:/i.test(url)){ location.href = url; return; } // অফলাইন পেজে পর্দা লাগে না
+      if(noWait || !/^https?:/i.test(url)){ location.href = url; return; } // অফলাইন পেজ ও নোটিফিকেশনের লিংকে পর্দা লাগে না
       if(ov) ov.classList.add("show");
       setTimeout(function(){ location.href = url; }, 60);
       return;
     }
-    if(ov && /^https?:/i.test(url)){ ov.classList.add("show"); setTimeout(function(){ ov.classList.remove("show"); }, 1500); }
+    if(ov && !noWait && /^https?:/i.test(url)){ ov.classList.add("show"); setTimeout(function(){ ov.classList.remove("show"); }, 1500); }
     var w = window.open(url, "_blank");
     if(!w) location.href = url;
   }
@@ -614,7 +614,7 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
       var sm = document.createElement("small"); sm.textContent = fmtTime(n.time); t.appendChild(sm);
       if(n.action === "update"){
         var b = document.createElement("button"); b.className = "na"; b.textContent = n.label || "ডাউনলোড";
-        b.onclick = function(){ openExternal(APK_URL); };
+        b.onclick = function(){ openExternal(APK_URL, true); };
         t.appendChild(b);
       }
       var x = document.createElement("button"); x.className = "nx"; x.textContent = "✕"; x.setAttribute("aria-label","মুছুন");
