@@ -92,9 +92,16 @@ public class MainActivity extends BridgeActivity {
         if (bottomWrap != null) bottomWrap.setVisibility(vis);
     }
 
+    // শুধু মূল হোম পেজ (index.html) — localhost-এর অন্য পেজ (যেমন offline-result.html) নয়
+    private boolean isHome(String url) {
+        if (url == null || !url.startsWith(HOME)) return false;
+        String rest = url.substring(HOME.length());
+        return rest.isEmpty() || rest.startsWith("#") || rest.startsWith("?") || rest.startsWith("index.html");
+    }
+
     private void updateBars(String url) {
         if (url == null) return;
-        if (url.startsWith(HOME)) setBars(false);
+        if (isHome(url)) setBars(false);
         else if (url.startsWith("http")) setBars(true);
     }
 
@@ -257,7 +264,7 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                if (url != null && url.startsWith(HOME)) {
+                if (isHome(url)) {
                     clearHistoryNext = true;
                     setBars(false); // হোমে ফেরার শুরুতেই নেটিভ বার লুকানো — নইলে হোমের নিজস্ব বারের সাথে দুইবার দেখায়
                 }
@@ -267,7 +274,7 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
                 super.doUpdateVisitedHistory(view, url, isReload);
-                if (url != null && url.startsWith(HOME)) setBars(false);
+                if (isHome(url)) setBars(false);
             }
 
             // নতুন পেজ পর্দায় ফুটে ওঠার পরেই বার দেখানো/লুকানো — আগে করলে হোমের বারের সাথে দুইবার দেখায়
@@ -282,7 +289,7 @@ public class MainActivity extends BridgeActivity {
                 super.onPageFinished(view, url);
                 if (url == null) return;
                 updateBars(url);
-                if (url.startsWith(HOME)) {
+                if (isHome(url)) {
                     if (clearHistoryNext) { view.clearHistory(); clearHistoryNext = false; }
                 } else if (url.startsWith("http")) {
                     view.evaluateJavascript(HIDE_BANNER_JS, null);
