@@ -245,3 +245,30 @@
     return ac.apply(this, arguments);
   };
 })();
+
+
+/* ---------- গুগল অ্যাপস স্ক্রিপ্টের ব্যানার লুকানো (ভাষা-নিরপেক্ষ) ---------- */
+(function () {
+  if (location.hostname.indexOf('script.google.com') < 0 || window.top !== window) return;
+
+  function hideBanner() {
+    var b = document.body;
+    if (!b) return;
+    var all = b.getElementsByTagName('*');
+    for (var i = 0; i < all.length; i++) {
+      var e = all[i];
+      if (e.tagName === 'SCRIPT' || e.tagName === 'STYLE' || e.tagName === 'IFRAME') continue;
+      if (e.children.length === 0 && (e.textContent || '').trim().length > 0) {
+        var t = e;
+        while (t.parentElement && t.parentElement !== b && !t.parentElement.querySelector('iframe')) {
+          t = t.parentElement;
+        }
+        t.style.setProperty('display', 'none', 'important');
+      }
+    }
+  }
+
+  hideBanner();
+  new MutationObserver(hideBanner).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('DOMContentLoaded', hideBanner);
+})();
