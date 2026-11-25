@@ -165,6 +165,12 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
 #notifPanel .ni .na{margin-top:8px;background:var(--green);color:#fff;border:0;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:700}
 #notifPanel .ni .nx{background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
 #notifPanel .ne{padding:22px 14px;text-align:center;color:var(--muted);font-size:13px}
+/* বাইরের পেজ লোডের সময় "অপেক্ষা করুন" পর্দা */
+#waitOv{position:fixed;inset:0;z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(10,77,57,.94);color:#fff;font-weight:700;font-size:18px;text-align:center;padding:24px}
+#waitOv.show{display:flex}
+#waitOv .sp{width:46px;height:46px;border:5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:waitSpin .8s linear infinite}
+#waitOv small{font-weight:400;font-size:13px;opacity:.85}
+@keyframes waitSpin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -305,6 +311,8 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
   <iframe id="vFrame" title="content" allow="camera; clipboard-write; fullscreen" referrerpolicy="no-referrer"></iframe>
 </div>
 
+<div id="waitOv" role="status" aria-live="polite"><div class="sp"></div><div>একটু অপেক্ষা করুন...</div><small>পেজ লোড হচ্ছে</small></div>
+
 <nav>
   <button class="active" data-tab="home"><span class="i">🏠</span>হোম</button>
   <button data-tab="results"><span class="i">📊</span>পরীক্ষা</button>
@@ -358,14 +366,21 @@ nav button.active .i{box-shadow:0 0 0 3px var(--gold),0 1px 4px rgba(0,0,0,.25)}
   }
   function openExternal(url){
     // অ্যাপের ভিতরেই খুলবে (একই WebView-তে)। ফিরতে ভাসমান "← অ্যাপে ফিরুন" বোতাম বা ফোনের ব্যাক বাটন।
+    var ov = $("#waitOv");
     if(isNative()){
       try{ sessionStorage.setItem("mbTab", current); }catch(e){}
-      location.href = url;
+      // নতুন পেজ ফুটে না ওঠা পর্যন্ত এই পর্দা থাকবে (পুরোনো পেজ ততক্ষণ পর্দায় থাকে)
+      if(!/^https?:/i.test(url)){ location.href = url; return; } // অফলাইন পেজে পর্দা লাগে না
+      if(ov) ov.classList.add("show");
+      setTimeout(function(){ location.href = url; }, 60);
       return;
     }
+    if(ov && /^https?:/i.test(url)){ ov.classList.add("show"); setTimeout(function(){ ov.classList.remove("show"); }, 1500); }
     var w = window.open(url, "_blank");
     if(!w) location.href = url;
   }
+  // ব্যাক করে ফিরলে পর্দা যেন আটকে না থাকে
+  window.addEventListener("pageshow", function(){ var o = $("#waitOv"); if(o) o.classList.remove("show"); });
   function openLink(key){
     var l = LINKS[key]; if(!l) return;
     if(l.ext || !USE_IFRAME){ openExternal(l.u); return; }
