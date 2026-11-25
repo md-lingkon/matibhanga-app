@@ -171,6 +171,8 @@ public class MainActivity extends BridgeActivity {
                 TextView ic = new TextView(this);
                 ic.setText(t[1]);
                 ic.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                ic.setTextColor(0xFF000000); // পুরো গাঢ় রং — ইমোজি আংশিক স্বচ্ছ দেখাত
+                ic.setIncludeFontPadding(false);
                 ic.setGravity(Gravity.CENTER);
                 GradientDrawable pill = new GradientDrawable();
                 pill.setColor(Color.WHITE);
