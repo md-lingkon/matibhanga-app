@@ -257,7 +257,17 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                if (url != null && url.startsWith(HOME)) clearHistoryNext = true;
+                if (url != null && url.startsWith(HOME)) {
+                    clearHistoryNext = true;
+                    setBars(false); // হোমে ফেরার শুরুতেই নেটিভ বার লুকানো — নইলে হোমের নিজস্ব বারের সাথে দুইবার দেখায়
+                }
+            }
+
+            // ব্যাক/হিস্ট্রি দিয়ে হোমে ফিরলেও যেন নেটিভ বার সাথে সাথে লুকায়
+            @Override
+            public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
+                super.doUpdateVisitedHistory(view, url, isReload);
+                if (url != null && url.startsWith(HOME)) setBars(false);
             }
 
             // নতুন পেজ পর্দায় ফুটে ওঠার পরেই বার দেখানো/লুকানো — আগে করলে হোমের বারের সাথে দুইবার দেখায়
